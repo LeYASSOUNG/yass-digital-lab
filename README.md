@@ -70,3 +70,5 @@ L'application web tourne sur `http://localhost:5174`.
 ---
 
 Créé avec ❤️ par **Diarrassouba Yassoungo Youssouf** — *Yass Digital Lab*
+🌐 **Portfolio** : [https://portfolio-tau-inky-96i2vyeddb.vercel.app/](https://portfolio-tau-inky-96i2vyeddb.vercel.app/)
+

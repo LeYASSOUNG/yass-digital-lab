@@ -8,7 +8,8 @@
           🧑‍💻
         </div>
         <div class="flex justify-center gap-3 mt-6" style="flex-wrap: wrap;">
-          <a href="#" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--color-border); color: var(--color-text); text-decoration: none; font-size: 0.9rem; transition: all 0.2s;">🐙 GitHub</a>
+          <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--color-accent); color: var(--color-accent); font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; background: rgba(212,175,55,0.1);">🌐 Mon Portfolio</a>
+          <a href="https://github.com/LeYASSOUNG" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--color-border); color: var(--color-text); text-decoration: none; font-size: 0.9rem; transition: all 0.2s;">🐙 GitHub</a>
           <a href="#" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--color-border); color: var(--color-text); text-decoration: none; font-size: 0.9rem; transition: all 0.2s;">💼 LinkedIn</a>
         </div>
       </div>
@@ -30,7 +31,8 @@
           de haute qualité (templates, packs de prompts, guides) qui font la différence dans votre travail quotidien.
         </p>
         <div class="flex gap-3" style="flex-wrap: wrap;">
-          <router-link to="/contact" class="btn btn-primary">📬 Me contacter</router-link>
+          <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" class="btn btn-primary">🌐 Visiter mon Portfolio</a>
+          <router-link to="/contact" class="btn btn-secondary">📬 Me contacter</router-link>
           <router-link to="/services" class="btn btn-secondary">💼 Mes services</router-link>
         </div>
       </div>

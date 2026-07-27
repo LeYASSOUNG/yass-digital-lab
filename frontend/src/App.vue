@@ -124,9 +124,9 @@
               Créateur d'outils numériques intelligents, templates SaaS et solutions d'intelligence artificielle sur mesure.
             </p>
             <div class="flex gap-3">
-              <a href="#" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; text-decoration: none;">🐙</a>
-              <a href="#" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; text-decoration: none;">💼</a>
-              <a href="#" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; text-decoration: none;">🐦</a>
+              <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" title="Mon Portfolio Vercel" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-accent); background: rgba(212,175,55,0.1); display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.1rem;">🌐</a>
+              <a href="https://github.com/LeYASSOUNG" target="_blank" title="GitHub" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; text-decoration: none;">🐙</a>
+              <a href="#" title="LinkedIn" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; text-decoration: none;">💼</a>
             </div>
           </div>
 
@@ -138,6 +138,7 @@
               <router-link to="/services" class="footer-link">💼 {{ t('services') }}</router-link>
               <router-link to="/blog" class="footer-link">📝 {{ t('blog') }}</router-link>
               <router-link to="/about" class="footer-link">👤 {{ t('about') }}</router-link>
+              <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" class="footer-link" style="color: var(--color-accent); font-weight: 700;">🌐 Mon Portfolio</a>
               <router-link to="/contact" class="footer-link">📬 {{ t('contact') }}</router-link>
             </div>
           </div>
@@ -159,7 +160,9 @@
 
         <div style="border-top: 1px solid var(--color-border); padding-top: 24px; text-align: center; color: var(--color-text-light); font-size: 0.85rem; flex-wrap: wrap; gap: 10px;" class="flex justify-between items-center">
           <span>© 2026 Yass Digital Lab — {{ t('footerRights') }}</span>
-          <span style="color: var(--color-accent); font-weight: 600;">Full Stack & IA Solutions</span>
+          <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" style="color: var(--color-accent); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>🌐 Portfolio Créateur : Diarrassouba Yassoungo Youssouf</span>
+          </a>
         </div>
       </div>
     </footer>
