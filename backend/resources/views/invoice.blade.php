@@ -82,7 +82,9 @@
         </table>
 
         <div class="bill-to">
-            <strong style="color: #0F172A; text-transform: uppercase; font-size: 11px;">Client / Facturé à :</strong><br>
+            <strong style="color: #0F172A; text-transform: uppercase; font-size: 11px;">
+                Client / Facturé à :
+            </strong><br>
             <span style="font-size: 14px; font-weight: bold;">{{ $order->email }}</span><br>
             <span style="color: #64748B; font-size: 11px;">
                 Statut du règlement : <strong style="color: #10B981;">Payé en ligne (Stripe)</strong>
