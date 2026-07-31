@@ -74,7 +74,7 @@ class PostController extends Controller
         $validated = $request->validate([
             'title'        => 'required|string|max:255',
             'content'      => 'required|string',
-            'is_published' => 'boolean' // true = publié, false = brouillon
+            'is_published' => 'boolean'
         ]);
 
         // Génération automatique du slug SEO depuis le titre

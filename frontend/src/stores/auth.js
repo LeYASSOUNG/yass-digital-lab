@@ -3,13 +3,7 @@
  * Store Pinia — Authentification (auth.js)
  * Yass Digital Lab — Frontend Vue 3
  * ============================================================
- * Gère l'état global d'authentification de l'application :
- *   - Session utilisateur (user, token)
- *   - Connexion / Inscription / Déconnexion
- *   - Persistance dans localStorage pour survivre au rechargement
- *   - Configuration automatique des headers Axios avec le Bearer token
- *
- * Utilisé dans : LoginView.vue, ClientDashboard.vue, App.vue, router/index.js
+ * Gère l'état global d'authentification de l'application.
  * ============================================================
  */
 
@@ -17,7 +11,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 
-/** Helper pour persister les tokens et configurer Axios */
 function setSessionData(userRef, tokenRef, userData, accessToken) {
   tokenRef.value = accessToken
   userRef.value  = userData
@@ -26,13 +19,26 @@ function setSessionData(userRef, tokenRef, userData, accessToken) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 }
 
-/** Helper pour nettoyer les tokens et réinitialiser Axios */
 function resetSessionData(userRef, tokenRef) {
   userRef.value  = null
   tokenRef.value = null
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   delete axios.defaults.headers.common['Authorization']
+}
+
+function formatRegisterPayload(payload, rest) {
+  if (typeof payload === 'object' && payload !== null) {
+    return payload
+  }
+  return {
+    name: payload,
+    email: rest[0],
+    password: rest[1],
+    phone: rest[2] || null,
+    company: rest[3] || null,
+    address: rest[4] || null,
+  }
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -50,24 +56,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /**
-   * Inscription d'un nouveau compte client.
-   *
-   * @param {Object|string} payload - Objet { name, email, password, phone, company, address } ou nom
-   */
   const register = async (payload, ...rest) => {
-    const data = typeof payload === 'object' && payload !== null
-      ? payload
-      : {
-          name: payload,
-          email: rest[0],
-          password: rest[1],
-          phone: rest[2] || null,
-          company: rest[3] || null,
-          address: rest[4] || null,
-        }
-
     try {
+      const data = formatRegisterPayload(payload, rest)
       const response = await axios.post('http://localhost:8000/api/register', data)
       setSessionData(user, token, response.data.user, response.data.access_token)
       return { success: true, user: user.value }

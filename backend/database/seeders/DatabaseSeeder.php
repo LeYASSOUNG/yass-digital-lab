@@ -33,7 +33,18 @@ class DatabaseSeeder extends Seeder
     /** 1. Comptes utilisateurs avec tous les rôles. */
     private function seedUsers(): void
     {
-        $users = [
+        foreach ($this->getUserDefinitions() as $data) {
+            User::firstOrCreate(
+                ['email' => $data['email']],
+                array_merge($data, ['password' => bcrypt('password')])
+            );
+        }
+    }
+
+    /** Définitions des utilisateurs pour seedUsers. */
+    private function getUserDefinitions(): array
+    {
+        return [
             [
                 'email'   => 'superadmin@yassdigital.lab',
                 'name'    => 'Yass Super Admin',
@@ -89,13 +100,6 @@ class DatabaseSeeder extends Seeder
                 'avatar'  => 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
             ],
         ];
-
-        foreach ($users as $data) {
-            User::firstOrCreate(
-                ['email' => $data['email']],
-                array_merge($data, ['password' => bcrypt('password')])
-            );
-        }
     }
 
     /**
@@ -125,24 +129,28 @@ class DatabaseSeeder extends Seeder
         ];
     }
 
-    /**
-     * 3. Produits numériques en catalogue.
-     *
-     * @param  array<string, Category> $categories
-     */
+    /** 3. Produits numériques en catalogue. */
     private function seedProducts(array $categories): void
     {
         if (Product::count() !== 0) {
             return;
         }
 
-        $products = [
+        foreach ($this->getProductDefinitions($categories) as $data) {
+            Product::create($data);
+        }
+    }
+
+    /** Définitions des produits pour seedProducts. */
+    private function getProductDefinitions(array $categories): array
+    {
+        return [
             [
                 'category_id' => $categories['ia']->id,
                 'title'       => 'Mega Pack 500+ Prompts ChatGPT & Claude Pro',
                 'slug'        => 'mega-pack-500-prompts-chatgpt-claude-pro',
                 'description' => 'Un pack complet de 500+ prompts optimisés pour la rédaction SEO, '
-                    . 'le code source, le marketing d\'acquisition et la productivité d\'entreprise.',
+                    . 'le code source, le marketing d\'acquisition et la productivité.',
                 'price' => 19.99,
                 'type'  => 'Pack',
             ],
@@ -151,7 +159,7 @@ class DatabaseSeeder extends Seeder
                 'title'       => 'Template SaaS Starter Vue 3 + Laravel 12 Glassmorphism',
                 'slug'        => 'template-saas-starter-vue-3-laravel-12',
                 'description' => 'Starter kit prêt pour la production avec authentification Sanctum, '
-                    . 'gestion des rôles (RBAC), paiement Stripe et design ultra-soigné.',
+                    . 'gestion des rôles (RBAC), paiement Stripe et design soigné.',
                 'price' => 49.99,
                 'type'  => 'Template',
             ],
@@ -169,7 +177,7 @@ class DatabaseSeeder extends Seeder
                 'title'       => 'Guide Ultime : Développer son premier Agent IA avec Python',
                 'slug'        => 'guide-ultime-agent-ia-python',
                 'description' => 'E-book pas-à-pas avec code fourni pour concevoir et déployer un agent IA '
-                    . 'autonome capable d\'analyser vos documents PDF et bases SQL.',
+                    . 'autonome capable d\'analyser vos documents PDF.',
                 'price' => 14.99,
                 'type'  => 'E-book',
             ],
@@ -192,10 +200,6 @@ class DatabaseSeeder extends Seeder
                 'type'  => 'Pack',
             ],
         ];
-
-        foreach ($products as $data) {
-            Product::create($data);
-        }
     }
 
     /** 4. Services de prestation. */
@@ -217,21 +221,21 @@ class DatabaseSeeder extends Seeder
                 'title'          => 'Développement d\'application SaaS & API Laravel / Vue.js',
                 'slug'           => 'developpement-application-saas-laravel-vue',
                 'description'    => 'Conception de plateformes web sur mesure avec architecture API RESTful, '
-                    . 'tableau de bord client, facturation automatisée et sécurité avancée.',
+                    . 'tableau de bord client, facturation automatisée.',
                 'starting_price' => 899.00,
             ],
             [
                 'title'          => 'Intégration d\'Agents IA & Automatisation de Workflows',
                 'slug'           => 'integration-agents-ia-automatisation',
                 'description'    => 'Développement et intégration d\'agents IA personnalisés (OpenAI/Claude) '
-                    . 'connectés à vos outils métiers pour automatiser vos tâches récurrentes.',
+                    . 'connectés à vos outils métiers pour automatiser.',
                 'starting_price' => 499.00,
             ],
             [
                 'title'          => 'Audit de Performance, SEO & Sécurité Web',
                 'slug'           => 'audit-performance-seo-securite-web',
                 'description'    => 'Analyse approfondie de votre code, temps de chargement (Core Web Vitals), '
-                    . 'failles de sécurité et recommandations concrètes d\'optimisation.',
+                    . 'failles de sécurité et recommandations.',
                 'starting_price' => 199.00,
             ],
         ];
@@ -253,8 +257,8 @@ class DatabaseSeeder extends Seeder
                 'title'        => '10 Prompts IA indispensables pour booster votre productivité en 2026',
                 'slug'         => '10-prompts-ia-indispensables',
                 'content'      => "L'Intelligence Artificielle transforme notre manière de travailler au quotidien. "
-                    . "Découvrez notre sélection des 10 meilleurs prompts à utiliser immédiatement sur ChatGPT et Claude "
-                    . "pour automatiser vos tâches récursives et produire du contenu de haute qualité en un temps record.\n\n"
+                    . "Découvrez notre sélection des 10 meilleurs prompts à utiliser sur ChatGPT "
+                    . "et Claude pour automatiser vos tâches récursives et produire du contenu.\n\n"
                     . "1. Résumer un long document en 5 points clés.\n"
                     . "2. Rédiger un email professionnel persuasif.\n"
                     . "3. Structurer le plan d'un article de blog SEO.\n"
@@ -265,18 +269,18 @@ class DatabaseSeeder extends Seeder
             [
                 'title'        => 'Pourquoi associer Vue 3 et Laravel 12 pour construire un SaaS moderne ?',
                 'slug'         => 'pourquoi-associer-vue-3-laravel-12-saas',
-                'content'      => "L'association de Vue 3 (Composition API) et de Laravel 12 représente aujourd'hui "
+                'content'      => "L'association de Vue 3 (Composition API) et de Laravel 12 représente "
                     . "le combo idéal pour développer des applications web rapides, évolutives et sécurisées.\n\n"
-                    . "Dans cet article, nous analysons pourquoi cette stack découplée offre une expérience développeur "
-                    . "inégalée et des performances de rendu optimales pour l'utilisateur final.",
+                    . "Dans cet article, nous analysons pourquoi cette stack découplée offre une expérience "
+                    . "développeur inégalée et des performances de rendu optimales.",
                 'is_published' => true,
             ],
             [
                 'title'        => 'Comment automatiser la création de contenu avec ChatGPT et N8N',
                 'slug'         => 'automatiser-creation-contenu-chatgpt-n8n',
-                'content'      => "Automatiser ses workflows éditoriaux permet d'économiser jusqu'à 15 heures par semaine. "
-                    . "Découvrez comment connecter l'API OpenAI à N8N pour générer, relire et planifier "
-                    . "automatiquement vos publications sur vos réseaux et votre blog.",
+                'content'      => "Automatiser ses workflows éditoriaux permet d'économiser du temps. "
+                    . "Découvrez comment connecter l'API OpenAI à N8N pour générer, relire "
+                    . "et planifier vos publications sur vos réseaux.",
                 'is_published' => true,
             ],
         ];
@@ -334,16 +338,28 @@ class DatabaseSeeder extends Seeder
 
         $orders = [
             [
-                'order'  => ['email' => 'client@yassdigital.lab', 'total_amount' => 19.99, 'status' => 'paid'],
-                'item'   => ['product_title' => 'Mega Pack 500+ Prompts ChatGPT & Claude Pro', 'price' => 19.99, 'quantity' => 1],
+                'order' => ['email' => 'client@yassdigital.lab', 'total_amount' => 19.99, 'status' => 'paid'],
+                'item'  => [
+                    'product_title' => 'Mega Pack 500+ Prompts ChatGPT & Claude Pro',
+                    'price'         => 19.99,
+                    'quantity'      => 1,
+                ],
             ],
             [
-                'order'  => ['email' => 'client@yassdigital.lab', 'total_amount' => 49.99, 'status' => 'paid'],
-                'item'   => ['product_title' => 'Template SaaS Starter Vue 3 + Laravel 12 Glassmorphism', 'price' => 49.99, 'quantity' => 1],
+                'order' => ['email' => 'client@yassdigital.lab', 'total_amount' => 49.99, 'status' => 'paid'],
+                'item'  => [
+                    'product_title' => 'Template SaaS Starter Vue 3 + Laravel 12 Glassmorphism',
+                    'price'         => 49.99,
+                    'quantity'      => 1,
+                ],
             ],
             [
-                'order'  => ['email' => 'sophie.martin@martin-digital.fr', 'total_amount' => 39.99, 'status' => 'paid'],
-                'item'   => ['product_title' => 'Kit d\'Automation N8N & Make pour Agences Tech', 'price' => 39.99, 'quantity' => 1],
+                'order' => ['email' => 'sophie.martin@martin-digital.fr', 'total_amount' => 39.99, 'status' => 'paid'],
+                'item'  => [
+                    'product_title' => 'Kit d\'Automation N8N & Make pour Agences Tech',
+                    'price'         => 39.99,
+                    'quantity'      => 1,
+                ],
             ],
         ];
 
