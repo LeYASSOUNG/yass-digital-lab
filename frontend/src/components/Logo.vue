@@ -1,5 +1,5 @@
 <template>
-  <div class="brand-logo flex items-center gap-3">
+  <div class="brand-logo flex items-center gap-3" :class="{ 'is-inverted': inverted }">
     <router-link to="/" class="flex items-center gap-3" style="text-decoration: none;">
       
       <!-- Emblem YDL Graphic Box -->
@@ -15,7 +15,7 @@
           
           <!-- Background Shape -->
           <rect width="100" height="100" rx="22" fill="#060B18"/>
-          <rect width="94" height="94" x="3" y="3" rx="19" fill="none" stroke="rgba(212,175,55,0.3)" stroke-width="2"/>
+          <rect width="94" height="94" x="3" y="3" rx="19" fill="none" stroke="rgba(212,175,55,0.4)" stroke-width="2"/>
 
           <!-- Pixel Blocks Top-Left -->
           <rect x="18" y="16" width="10" height="10" fill="url(#goldGradientLogo)" rx="1"/>
@@ -37,7 +37,7 @@
           <span class="text-main">DIGITAL</span>
           <span class="text-gold">LAB</span>
         </div>
-        <span v-if="showTagline" class="brand-sub" style="font-size: 0.65rem; color: var(--color-text-light); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-top: 2px;">
+        <span v-if="showTagline" class="brand-sub" style="font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-top: 2px;">
           Outils Numériques Intelligents
         </span>
       </div>
@@ -50,7 +50,8 @@
 defineProps({
   size: { type: Number, default: 44 },
   mode: { type: String, default: 'full' },
-  showTagline: { type: Boolean, default: true }
+  showTagline: { type: Boolean, default: true },
+  inverted: { type: Boolean, default: false }
 });
 </script>
 
@@ -71,14 +72,24 @@ defineProps({
 
 .text-gold {
   color: var(--color-accent);
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
 }
 
 .text-main {
-  color: #0F172A;
+  color: var(--color-text);
 }
 
-[data-theme="dark"] .text-main {
-  color: #FFFFFF;
+[data-theme="dark"] .text-main,
+.is-inverted .text-main {
+  color: #FFFFFF !important;
+}
+
+.brand-sub {
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .brand-sub,
+.is-inverted .brand-sub {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 </style>

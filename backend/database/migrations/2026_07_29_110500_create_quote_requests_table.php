@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('quote_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->integer('rating')->default(5);
-            $table->text('comment');
-            $table->boolean('is_published')->default(true);
+            $table->string('email');
+            $table->string('service_title');
+            $table->text('details')->nullable();
+            $table->string('status')->default('pending'); // 'pending', 'contacted', 'completed'
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('quote_requests');
     }
 };
