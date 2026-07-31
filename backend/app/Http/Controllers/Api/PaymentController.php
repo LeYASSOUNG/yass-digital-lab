@@ -57,13 +57,14 @@ class PaymentController extends Controller
         $lineItems = [];
 
         foreach ($request->items as $item) {
+            // Devise : Euro | Montant en centimes requis par Stripe (ex: 29.99€ → 2999)
             $lineItems[] = [
                 'price_data' => [
-                    'currency'     => 'eur',                         // Devise : Euro
+                    'currency'     => 'eur',
                     'product_data' => [
-                        'name' => $item['title'],                    // Nom du produit affiché sur Stripe
+                        'name' => $item['title'],
                     ],
-                    'unit_amount'  => intval($item['price'] * 100),  // Stripe exige le montant en centimes (ex: 29.99€ → 2999)
+                    'unit_amount'  => intval($item['price'] * 100),
                 ],
                 'quantity' => $item['quantity'],
             ];

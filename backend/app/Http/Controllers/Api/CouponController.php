@@ -111,7 +111,8 @@ class CouponController extends Controller
         $coupon = Coupon::findOrFail($id);
 
         $validated = $request->validate([
-            'code'                => 'sometimes|string|unique:coupons,code,' . $id, // Ignore l'ID courant pour la règle unique
+            // La règle unique ignore l'enregistrement courant pour éviter les faux conflits
+            'code'                => 'sometimes|string|unique:coupons,code,' . $id,
             'discount_amount'     => 'nullable|numeric',
             'discount_percentage' => 'nullable|numeric',
             'expires_at'          => 'nullable|date'

@@ -7,17 +7,58 @@
         body { font-family: DejaVu Sans, sans-serif; color: #0F172A; margin: 0; padding: 20px; font-size: 13px; }
         .invoice-card { border: 2px solid #D4AF37; padding: 30px; border-radius: 12px; }
         .top-header { border-bottom: 2px solid #E2E8F0; padding-bottom: 20px; margin-bottom: 30px; }
-        .logo-title { font-size: 26px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: -0.5px; }
+        .logo-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0F172A;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
         .accent { color: #D4AF37; }
         .invoice-details { text-align: right; }
-        .bill-to { background: #F8FAFC; padding: 16px; border-radius: 8px; border-left: 4px solid #D4AF37; margin-bottom: 30px; }
+        .bill-to {
+            background: #F8FAFC;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #D4AF37;
+            margin-bottom: 30px;
+        }
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th { background: #0F172A; color: #FFFFFF; text-align: left; padding: 10px 14px; font-size: 12px; text-transform: uppercase; }
+        th {
+            background: #0F172A;
+            color: #FFFFFF;
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
         td { padding: 12px 14px; border-bottom: 1px solid #E2E8F0; }
-        .summary-box { width: 40%; float: right; background: #F8FAFC; padding: 16px; border-radius: 8px; border: 1px solid #E2E8F0; }
+        .summary-box {
+            width: 40%;
+            float: right;
+            background: #F8FAFC;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
         .summary-row { display: flex; justify-content: space-between; padding: 4px 0; }
-        .total-row { font-weight: bold; font-size: 16px; color: #D4AF37; border-top: 2px solid #D4AF37; padding-top: 8px; margin-top: 8px; }
-        .footer-note { clear: both; margin-top: 60px; text-align: center; font-size: 11px; color: #64748B; border-top: 1px solid #E2E8F0; padding-top: 20px; }
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+            color: #D4AF37;
+            border-top: 2px solid #D4AF37;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .footer-note {
+            clear: both;
+            margin-top: 60px;
+            text-align: center;
+            font-size: 11px;
+            color: #64748B;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -30,8 +71,12 @@
                 </td>
                 <td style="border: none; padding: 0; text-align: right;">
                     <h2 style="margin: 0; color: #D4AF37;">FACTURE</h2>
-                    <div style="font-weight: bold; margin-top: 4px;">N° FA-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
-                    <div style="color: #64748B; font-size: 11px; margin-top: 2px;">Date : {{ $order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y') }}</div>
+                    <div style="font-weight: bold; margin-top: 4px;">
+                        N° FA-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
+                    </div>
+                    <div style="color: #64748B; font-size: 11px; margin-top: 2px;">
+                        Date : {{ $order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y') }}
+                    </div>
                 </td>
             </tr>
         </table>
@@ -39,7 +84,9 @@
         <div class="bill-to">
             <strong style="color: #0F172A; text-transform: uppercase; font-size: 11px;">Client / Facturé à :</strong><br>
             <span style="font-size: 14px; font-weight: bold;">{{ $order->email }}</span><br>
-            <span style="color: #64748B; font-size: 11px;">Statut du règlement : <strong style="color: #10B981;">Payé en ligne (Stripe)</strong></span>
+            <span style="color: #64748B; font-size: 11px;">
+                Statut du règlement : <strong style="color: #10B981;">Payé en ligne (Stripe)</strong>
+            </span>
         </div>
 
         <table>
@@ -57,7 +104,9 @@
                     <td style="font-weight: bold;">{{ $item->product_title }}</td>
                     <td style="text-align: center;">{{ $item->quantity }}</td>
                     <td style="text-align: right;">{{ number_format($item->price, 2) }} €</td>
-                    <td style="text-align: right; font-weight: bold;">{{ number_format($item->price * $item->quantity, 2) }} €</td>
+                    <td style="text-align: right; font-weight: bold;">
+                        {{ number_format($item->price * $item->quantity, 2) }} €
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -70,19 +119,19 @@
                     <span>{{ number_format($order->total_amount, 2) }} €</span>
                 </div>
                 <div class="summary-row">
-                    <span>TVA (0% - Exo. Art 293B) :</span>
+                    <span>TVA (0% - Auto-liquidation) :</span>
                     <span>0.00 €</span>
                 </div>
                 <div class="summary-row total-row">
-                    <span>Montant Total Net :</span>
+                    <span>Total à Payer :</span>
                     <span>{{ number_format($order->total_amount, 2) }} €</span>
                 </div>
             </div>
         </div>
 
         <div class="footer-note">
-            <p><strong>Merci pour votre achat sur Yass Digital Lab !</strong></p>
-            <p>Facture générée automatiquement. Pour toute question, contactez contact@yassdigital.lab.</p>
+            <p><strong>Yass Digital Lab</strong> — Outils Numériques Intelligents & Développement Sur-Mesure</p>
+            <p>Merci pour votre confiance ! Pour toute question : contact@yassdigitallab.com</p>
         </div>
     </div>
 </body>

@@ -84,10 +84,12 @@ class OrderController extends Controller
 
         // Création de la commande principale en base de données
         $order = Order::create([
-            'email'             => $validated['email'],
-            'total_amount'      => $totalAmount,
-            'status'            => 'paid',                           // Statut : payé (paiement déjà validé par Stripe)
-            'stripe_session_id' => $validated['stripe_session_id'] ?? null // Pour retrouver la commande sur le dashboard Stripe
+            'email'        => $validated['email'],
+            'total_amount' => $totalAmount,
+            // Statut : payé (paiement déjà validé par Stripe)
+            'status'            => 'paid',
+            // Identifiant de session Stripe pour traçabilité sur le dashboard Stripe
+            'stripe_session_id' => $validated['stripe_session_id'] ?? null,
         ]);
 
         // Création de chaque article lié à la commande (relation OrderItem)

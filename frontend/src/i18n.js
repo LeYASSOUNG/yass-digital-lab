@@ -25,7 +25,8 @@ export const translations = {
     // Home Page
     heroBadge: 'Solutions Numériques & Intelligence Artificielle',
     heroTitle: 'Des outils numériques intelligents pour aller plus loin.',
-    heroSubtitle: 'Découvrez nos packs de prompts optimisés, templates d\'applications SaaS, e-books et prestations sur mesure par Yass Digital Lab.',
+    heroSubtitle: 'Découvrez nos packs de prompts optimisés, templates d\'applications SaaS, '
+      + 'e-books et prestations sur mesure par Yass Digital Lab.',
     exploreCatalog: '🛍️ Explorer le catalogue',
     requestQuote: '💼 Demander un devis',
     featuredProducts: '🔥 Produits Phares',
@@ -63,7 +64,8 @@ export const translations = {
     aboutSub: 'Passionné par l\'Intelligence Artificielle et le développement Web haute performance.',
     bioTitle: 'Diarrassouba Yassoungo Youssouf',
     bioSub: 'Développeur Full Stack & Spécialiste IA',
-    bioText: 'Fondateur de Yass Digital Lab, je conçois des solutions numériques modernes et intelligentes combinant architectures web robustes (Laravel, Vue.js, PostgreSQL) et puissance des modèles d\'IA.',
+    bioText: 'Fondateur de Yass Digital Lab, je conçois des solutions numériques modernes et intelligentes '
+      + 'combinant architectures web robustes (Laravel, Vue.js, PostgreSQL) et puissance des modèles d\'IA.',
 
     // Contact Page
     contactTitle: 'Contactez-nous',
@@ -95,7 +97,8 @@ export const translations = {
     // Home Page
     heroBadge: 'Digital Solutions & Artificial Intelligence',
     heroTitle: 'Smart digital tools to power your progress.',
-    heroSubtitle: 'Explore optimized prompt packs, SaaS templates, e-books, and custom digital services by Yass Digital Lab.',
+    heroSubtitle: 'Explore optimized prompt packs, SaaS templates, e-books, '
+      + 'and custom digital services by Yass Digital Lab.',
     exploreCatalog: '🛍️ Explore Catalog',
     requestQuote: '💼 Request a Quote',
     featuredProducts: '🔥 Featured Products',
@@ -133,7 +136,8 @@ export const translations = {
     aboutSub: 'Passionate about Artificial Intelligence & high-performance Web development.',
     bioTitle: 'Diarrassouba Yassoungo Youssouf',
     bioSub: 'Full Stack Developer & AI Specialist',
-    bioText: 'Founder of Yass Digital Lab, I build modern, smart digital products combining robust web architectures (Laravel, Vue.js, PostgreSQL) with state-of-the-art AI models.',
+    bioText: 'Founder of Yass Digital Lab, I build modern, smart digital products combining robust '
+      + 'web architectures (Laravel, Vue.js, PostgreSQL) with state-of-the-art AI models.',
 
     // Contact Page
     contactTitle: 'Get in Touch',

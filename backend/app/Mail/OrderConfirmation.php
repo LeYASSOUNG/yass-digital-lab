@@ -46,14 +46,13 @@ class OrderConfirmation extends Mailable
      *
      * Le numéro de commande est inclus dans l'objet pour faciliter
      * la reconnaissance immédiate par le client dans sa boîte mail.
-     *
-     * @return Envelope  Objet contenant les métadonnées de l'email
+     * @return Envelope Objet contenant les métadonnées de l'email
      */
     public function envelope(): Envelope
     {
+        $orderNum = str_pad($this->order->id, 6, '0', STR_PAD_LEFT);
         return new Envelope(
-            // Objet de l'email avec numéro de commande formaté (ex: FA-000042)
-            subject: '✅ Confirmation de votre commande #FA-' . str_pad($this->order->id, 6, '0', STR_PAD_LEFT) . ' — Yass Digital Lab',
+            subject: "✅ Confirmation de votre commande #FA-{$orderNum} — Yass Digital Lab",
         );
     }
 
