@@ -3,6 +3,7 @@
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=flat-square&logo=vuedotjs)](https://vuejs.org/)
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.x-4169E1?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
+[![Herald Score](https://img.shields.io/badge/Herald_Quality-Grade_A_(91%2F100)-10B981?style=flat-square)](https://github.com/LeYASSOUNG/yass-digital-lab)
 
 **Yass Digital Lab** est une plateforme e-commerce & SaaS d'élite permettant la vente de ressources numériques, templates web d'applications, e-books et prestations sur mesure.
 
