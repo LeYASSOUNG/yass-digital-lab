@@ -39,7 +39,7 @@
     </div>
 
     <!-- Pills de Catégories -->
-    <div class="flex gap-2 mb-8" style="flex-wrap: wrap; items-center;">
+    <div class="flex gap-2 mb-8" style="flex-wrap: wrap; align-items: center;">
       <button
         v-for="cat in categories"
         :key="cat"
@@ -98,7 +98,7 @@
         <div style="padding: 24px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <h3 class="mb-2" style="font-size: 1.2rem;">{{ product.title }}</h3>
-            <p style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ product.description }}</p>
+            <p style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ product.description }}</p>
           </div>
 
           <div>

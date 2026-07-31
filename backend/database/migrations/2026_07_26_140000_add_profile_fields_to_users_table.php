@@ -18,6 +18,9 @@ return new class extends Migration
             if (!Schema::hasColumn('users', 'address')) {
                 $table->text('address')->nullable();
             }
+            if (!Schema::hasColumn('users', 'avatar')) {
+                $table->string('avatar')->nullable();
+            }
         });
     }
 

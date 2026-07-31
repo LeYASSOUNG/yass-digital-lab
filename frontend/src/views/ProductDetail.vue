@@ -162,10 +162,7 @@ const relatedProducts = ref([]);
 const loading = ref(true);
 const showReviewForm = ref(false);
 
-const reviews = ref([
-  { id: 1, name: 'Alexandre M.', rating: 5, comment: 'Exactement ce dont j\'avais besoin. Le gain de temps est colossal.' },
-  { id: 2, name: 'Sarah K.', rating: 5, comment: 'Support très réactif et code d\'une grande propreté.' }
-]);
+const reviews = ref([]);
 
 const newReview = ref({ name: '', rating: 5, comment: '' });
 
@@ -174,6 +171,14 @@ const loadProduct = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8000/api/products/${id}`);
     product.value = response.data;
+    if (response.data.reviews && response.data.reviews.length > 0) {
+      reviews.value = response.data.reviews;
+    } else {
+      reviews.value = [
+        { id: 1, name: 'Alexandre M.', rating: 5, comment: 'Exactement ce dont j\'avais besoin. Le gain de temps est colossal.' },
+        { id: 2, name: 'Sarah K.', rating: 5, comment: 'Support très réactif et code d\'une grande propreté.' }
+      ];
+    }
     
     const allRes = await axios.get('http://localhost:8000/api/products');
     relatedProducts.value = allRes.data.filter(p => p.id != id).slice(0, 3);
