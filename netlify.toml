@@ -1,0 +1,12 @@
+# Configuration Netlify pour Yass Digital Lab (Frontend Vue 3 + Vite)
+
+[build]
+  base    = "frontend"
+  publish = "dist"
+  command = "npm run build"
+
+# Redirection SPA : Renvoie toutes les routes vers index.html (évite les erreurs 404 au rechargement)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
