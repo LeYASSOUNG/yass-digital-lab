@@ -9,14 +9,13 @@
 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '../api'
 
 function setSessionData(userRef, tokenRef, userData, accessToken) {
   tokenRef.value = accessToken
   userRef.value  = userData
   localStorage.setItem('token', accessToken)
   localStorage.setItem('user', JSON.stringify(userData))
-  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 }
 
 function resetSessionData(userRef, tokenRef) {
@@ -24,7 +23,6 @@ function resetSessionData(userRef, tokenRef) {
   tokenRef.value = null
   localStorage.removeItem('token')
   localStorage.removeItem('user')
-  delete axios.defaults.headers.common['Authorization']
 }
 
 function formatRegisterPayload(payload, rest) {
@@ -47,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/login', { email, password })
+      const response = await api.post('/login', { email, password })
       setSessionData(user, token, response.data.user, response.data.access_token)
       return { success: true, user: user.value }
     } catch (error) {
@@ -59,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
   const register = async (payload, ...rest) => {
     try {
       const data = formatRegisterPayload(payload, rest)
-      const response = await axios.post('http://localhost:8000/api/register', data)
+      const response = await api.post('/register', data)
       setSessionData(user, token, response.data.user, response.data.access_token)
       return { success: true, user: user.value }
     } catch (error) {
@@ -74,9 +72,7 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = async () => {
     try {
       if (token.value) {
-        await axios.post('http://localhost:8000/api/logout', {}, {
-          headers: { Authorization: `Bearer ${token.value}` }
-        })
+        await api.post('/logout')
       }
     } catch (e) {
       console.error(e)

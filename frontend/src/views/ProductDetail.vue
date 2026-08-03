@@ -150,7 +150,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useToastStore } from '../stores/toast';
-import axios from 'axios';
+import api from '../api';
 
 const route = useRoute();
 const router = useRouter();
@@ -169,7 +169,7 @@ const newReview = ref({ name: '', rating: 5, comment: '' });
 const loadProduct = async (id) => {
   loading.value = true;
   try {
-    const response = await axios.get(`http://localhost:8000/api/products/${id}`);
+    const response = await api.get(`/products/${id}`);
     product.value = response.data;
     if (response.data.reviews && response.data.reviews.length > 0) {
       reviews.value = response.data.reviews;
@@ -180,7 +180,7 @@ const loadProduct = async (id) => {
       ];
     }
     
-    const allRes = await axios.get('http://localhost:8000/api/products');
+    const allRes = await api.get('/products');
     relatedProducts.value = allRes.data.filter(p => p.id != id).slice(0, 3);
   } catch (error) {
     console.error("Erreur lors de la récupération du produit:", error);
@@ -218,7 +218,7 @@ const buyNow = () => {
 
 const submitReview = async () => {
   try {
-    const res = await axios.post(`http://localhost:8000/api/products/${route.params.id}/reviews`, newReview.value);
+    const res = await api.post(`/products/${route.params.id}/reviews`, newReview.value);
     reviews.value.unshift({
       id: res.data.review?.id || Date.now(),
       name: newReview.value.name,

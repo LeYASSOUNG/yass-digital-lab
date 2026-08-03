@@ -127,7 +127,7 @@ import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
 import { t } from '../i18n';
-import axios from 'axios';
+import api from '../api';
 
 const cart = useCartStore();
 const wishlist = useWishlistStore();
@@ -193,7 +193,7 @@ const quickAddToCart = (product) => {
 
 onMounted(async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/products');
+    const res = await api.get('/products');
     products.value = res.data;
   } catch (e) {
     console.error('Erreur produits:', e);

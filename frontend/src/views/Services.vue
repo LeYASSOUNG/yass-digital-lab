@@ -111,7 +111,7 @@ const quoteForm = ref({ name: '', email: '', details: '' });
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/services');
+    const response = await api.get('/services');
     services.value = response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des services:", error);
@@ -222,7 +222,7 @@ const downloadQuotePDF = () => {
 const submitQuoteRequest = async () => {
   if (!selectedService.value) return;
   try {
-    await axios.post('http://localhost:8000/api/quote-requests', {
+    await api.post('/quote-requests', {
       name: quoteForm.value.name,
       email: quoteForm.value.email,
       service_title: selectedService.value.title,

@@ -605,7 +605,7 @@ import { useAuthStore } from '../stores/auth';
 import { useRouter } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
 import SalesChart from '../components/SalesChart.vue';
-import axios from 'axios';
+import api from '../api';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -692,7 +692,7 @@ const startEditProduct = (product) => {
 const updateProduct = async () => {
   if (!editingProduct.value) return;
   try {
-    await axios.put(`http://localhost:8000/api/products/${editingProduct.value.id}`, editingProduct.value, authHeaders.value);
+    await api.put(`/products/${editingProduct.value.id}`, editingProduct.value);
     editingProduct.value = null;
     await loadProducts();
   } catch(e) { alert('Erreur lors de la modification du produit'); }
@@ -705,7 +705,7 @@ const startEditPost = (post) => {
 const updatePost = async () => {
   if (!editingPost.value) return;
   try {
-    await axios.put(`http://localhost:8000/api/posts/${editingPost.value.id}`, editingPost.value, authHeaders.value);
+    await api.put(`/posts/${editingPost.value.id}`, editingPost.value);
     editingPost.value = null;
     await loadPosts();
   } catch(e) { alert('Erreur lors de la modification de l\'article'); }
@@ -718,7 +718,7 @@ const startEditCoupon = (coupon) => {
 const updateCoupon = async () => {
   if (!editingCoupon.value) return;
   try {
-    await axios.put(`http://localhost:8000/api/coupons/${editingCoupon.value.id}`, editingCoupon.value, authHeaders.value);
+    await api.put(`/coupons/${editingCoupon.value.id}`, editingCoupon.value);
     editingCoupon.value = null;
     await loadCoupons();
   } catch(e) { alert('Erreur lors de la modification du coupon'); }
@@ -746,7 +746,7 @@ onMounted(async () => {
 
 const loadReviews = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/reviews', authHeaders.value);
+    const res = await api.get('/reviews');
     reviewsList.value = res.data;
   } catch(e) { reviewsList.value = []; }
 };
@@ -754,7 +754,7 @@ const loadReviews = async () => {
 const deleteReview = async (id) => {
   if (confirm('Supprimer ce commentaire / avis ?')) {
     try {
-      await axios.delete(`http://localhost:8000/api/reviews/${id}`, authHeaders.value);
+      await api.delete(`/reviews/${id}`);
       await loadReviews();
     } catch(e) { alert('Erreur lors de la suppression du commentaire.'); }
   }
@@ -762,14 +762,14 @@ const deleteReview = async (id) => {
 
 const loadQuoteRequests = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/quote-requests', authHeaders.value);
+    const res = await api.get('/quote-requests');
     quoteRequests.value = res.data;
   } catch(e) { quoteRequests.value = []; }
 };
 
 const updateQuoteStatus = async (id, status) => {
   try {
-    await axios.put(`http://localhost:8000/api/quote-requests/${id}/status`, { status }, authHeaders.value);
+    await api.put(`/quote-requests/${id}/status`, { status });
     await loadQuoteRequests();
   } catch(e) { alert('Erreur lors de la mise à jour du statut'); }
 };
@@ -777,43 +777,43 @@ const updateQuoteStatus = async (id, status) => {
 const deleteQuoteRequest = async (id) => {
   if (confirm('Supprimer cette demande de devis ?')) {
     try {
-      await axios.delete(`http://localhost:8000/api/quote-requests/${id}`, authHeaders.value);
+      await api.delete(`/quote-requests/${id}`);
       await loadQuoteRequests();
     } catch(e) { alert('Erreur lors de la suppression'); }
   }
 };
 
 const loadProducts = async () => {
-  const res = await axios.get('http://localhost:8000/api/products');
+  const res = await api.get('/products');
   products.value = res.data;
 };
 const loadOrders = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/orders', authHeaders.value);
+    const res = await api.get('/orders');
     orders.value = res.data;
   } catch(e) { orders.value = []; }
 };
 const loadPosts = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/posts');
+    const res = await api.get('/posts');
     posts.value = res.data;
   } catch(e) { posts.value = []; }
 };
 const loadSubscribers = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/newsletter', authHeaders.value);
+    const res = await api.get('/newsletter');
     subscribers.value = res.data;
   } catch(e) { subscribers.value = []; }
 };
 const loadCoupons = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/coupons', authHeaders.value);
+    const res = await api.get('/coupons');
     coupons.value = res.data;
   } catch(e) { coupons.value = []; }
 };
 const loadUsers = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/users', authHeaders.value);
+    const res = await api.get('/users');
     usersList.value = res.data;
   } catch(e) { 
     console.error('Erreur chargement utilisateurs', e);
@@ -823,7 +823,7 @@ const loadUsers = async () => {
 
 const changeRole = async (userId, newRole) => {
   try {
-    const res = await axios.put(`http://localhost:8000/api/users/${userId}/role`, { role: newRole }, authHeaders.value);
+    const res = await api.put(`/users/${userId}/role`, { role: newRole });
     alert(res.data.message);
     await loadUsers();
   } catch(e) {
@@ -834,7 +834,7 @@ const changeRole = async (userId, newRole) => {
 const deleteUser = async (userId) => {
   if (confirm('Supprimer définitivement cet utilisateur ?')) {
     try {
-      const res = await axios.delete(`http://localhost:8000/api/users/${userId}`, authHeaders.value);
+      const res = await api.delete(`/users/${userId}`);
       alert(res.data.message);
       await loadUsers();
     } catch(e) {
@@ -845,7 +845,7 @@ const deleteUser = async (userId) => {
 
 const createProduct = async () => {
   try {
-    await axios.post('http://localhost:8000/api/products', newProduct.value, authHeaders.value);
+    await api.post('/products', newProduct.value);
     showForm.value = false;
     newProduct.value = { title: '', price: '', type: 'Pack', description: '', category_id: 1 };
     await loadProducts();
@@ -854,7 +854,7 @@ const createProduct = async () => {
 
 const createPost = async () => {
   try {
-    await axios.post('http://localhost:8000/api/posts', newPost.value, authHeaders.value);
+    await api.post('/posts', newPost.value);
     showPostForm.value = false;
     newPost.value = { title: '', content: '', is_published: true };
     await loadPosts();
@@ -888,7 +888,7 @@ const downloadCSV = (filename, content) => {
 
 const deleteProduct = async (id) => {
   if (confirm('Supprimer ce produit ?')) {
-    await axios.delete(`http://localhost:8000/api/products/${id}`, authHeaders.value);
+    await api.delete(`/products/${id}`);
     await loadProducts();
   }
 };
@@ -896,7 +896,7 @@ const deleteProduct = async (id) => {
 const deletePost = async (id) => {
   if (confirm('Supprimer cet article ?')) {
     try {
-      await axios.delete(`http://localhost:8000/api/posts/${id}`, authHeaders.value);
+      await api.delete(`/posts/${id}`);
       await loadPosts();
     } catch(e) { alert('Erreur lors de la suppression de l\'article.'); }
   }
@@ -905,7 +905,7 @@ const deletePost = async (id) => {
 const deleteCoupon = async (id) => {
   if (confirm('Supprimer ce coupon ?')) {
     try {
-      await axios.delete(`http://localhost:8000/api/coupons/${id}`, authHeaders.value);
+      await api.delete(`/coupons/${id}`);
       await loadCoupons();
     } catch(e) { alert('Erreur lors de la suppression du coupon.'); }
   }
