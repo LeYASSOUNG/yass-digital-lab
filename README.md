@@ -27,19 +27,31 @@
 
 - **Frontend** : Vue 3 (`<script setup>`), Pinia, Vue Router 4, Vanilla CSS Design System.
 - **Backend API** : Laravel 12 API, Sanctum Authentication, DomPDF (`barryvdh/laravel-dompdf`).
-- **Base de Données** : PostgreSQL / SQLite.
+- **Base de Données** : PostgreSQL (Neon) en production / SQLite en local.
 
 ---
 
-## 💻 Installation & Démarrage
+## 🌐 Hébergement en Production
+
+| Service | Plateforme | URL |
+| --- | --- | --- |
+| Frontend | Vercel | Votre URL Vercel |
+| Backend API | Render | <https://yass-digital-backend.onrender.com> |
+| Base de Données | Neon (PostgreSQL) | Neon Dashboard |
+
+---
+
+## 💻 Installation & Démarrage Local
 
 ### 1. Cloner le Projet
+
 ```bash
 git clone https://github.com/LeYASSOUNG/yass-digital-lab.git
 cd yass-digital-lab
 ```
 
 ### 2. Backend (Laravel API)
+
 ```bash
 cd backend
 composer install
@@ -48,14 +60,17 @@ php artisan key:generate
 php artisan migrate --seed
 php artisan serve
 ```
+
 Le serveur API tourne sur `http://localhost:8000`.
 
 ### 3. Frontend (Vue 3 + Vite)
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
 L'application web tourne sur `http://localhost:5174`.
 
 ---
@@ -63,7 +78,7 @@ L'application web tourne sur `http://localhost:5174`.
 ## 🔑 Comptes de Démonstration
 
 | Rôle | Email | Mot de passe |
-|---|---|---|
+| --- | --- | --- |
 | **Super Admin** | `superadmin@yassdigital.lab` | `password` |
 | **Admin** | `admin@yassdigital.lab` | `password` |
 | **Client** | `client@yassdigital.lab` | `password` |
@@ -71,5 +86,5 @@ L'application web tourne sur `http://localhost:5174`.
 ---
 
 Créé avec ❤️ par **Diarrassouba Yassoungo Youssouf** — *Yass Digital Lab*
-🌐 **Portfolio** : [https://portfolio-tau-inky-96i2vyeddb.vercel.app/](https://portfolio-tau-inky-96i2vyeddb.vercel.app/)
 
+🌐 **Portfolio** : [portfolio-tau-inky-96i2vyeddb.vercel.app](https://portfolio-tau-inky-96i2vyeddb.vercel.app/)
