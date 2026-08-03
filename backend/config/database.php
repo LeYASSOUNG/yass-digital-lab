@@ -91,8 +91,10 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DATABASE_URL') ?: env('DB_URL'),
-            'host' => env('DB_HOST') ?: '127.0.0.1',
+            'url' => (env('DB_HOST') && (str_starts_with(env('DB_HOST'), 'postgres://') || str_starts_with(env('DB_HOST'), 'postgresql://')))
+                ? env('DB_HOST')
+                : (env('DATABASE_URL') ?: env('DB_URL')),
+            'host' => (env('DB_HOST') && !str_contains(env('DB_HOST'), '://')) ? env('DB_HOST') : '127.0.0.1',
             'port' => env('DB_PORT') ?: '5432',
             'database' => env('DB_DATABASE') ?: 'laravel',
             'username' => env('DB_USERNAME') ?: 'root',
