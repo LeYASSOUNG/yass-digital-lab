@@ -271,7 +271,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { t } from '../i18n';
-import axios from 'axios';
+import api from '../api';
 import { 
   Package, 
   Zap, 
@@ -334,8 +334,8 @@ const prevReview = () => {
 onMounted(async () => {
   try {
     const [productsRes, servicesRes] = await Promise.all([
-      axios.get('http://localhost:8000/api/products'),
-      axios.get('http://localhost:8000/api/services')
+      api.get('/products'),
+      api.get('/services')
     ]);
     featuredProducts.value = productsRes.data.slice(0, 3);
     services.value = servicesRes.data.slice(0, 4);

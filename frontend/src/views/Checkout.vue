@@ -82,7 +82,7 @@
 import { useCartStore } from '../stores/cart';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
-import axios from 'axios';
+import api from '../api';
 
 const cart = useCartStore();
 const router = useRouter();
@@ -104,7 +104,7 @@ const applyCoupon = async () => {
   applyingCoupon.value = true;
   couponMessage.value = '';
   try {
-    const res = await axios.post('http://localhost:8000/api/coupons/validate', { code: couponCode.value.trim() });
+    const res = await api.post('/coupons/validate', { code: couponCode.value.trim() });
     if (res.data.discount_amount) {
       discount.value = parseFloat(res.data.discount_amount);
     } else if (res.data.discount_percentage) {
@@ -124,7 +124,7 @@ const processPayment = async () => {
   
   // Enregistrer la commande dans la BD
   try {
-    await axios.post('http://localhost:8000/api/orders', {
+    await api.post('/orders', {
       email: email.value,
       items: cart.items,
       total_amount: finalTotal.value
@@ -135,7 +135,7 @@ const processPayment = async () => {
 
   if (paymentMethod.value === 'stripe') {
     try {
-      const response = await axios.post('http://localhost:8000/api/create-checkout-session', {
+      const response = await api.post('/create-checkout-session', {
         items: cart.items,
         email: email.value
       });

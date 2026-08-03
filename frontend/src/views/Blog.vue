@@ -32,7 +32,7 @@
       >
         <!-- Image / bannière -->
         <div style="height: 200px; background: linear-gradient(135deg, var(--color-primary), #1e3a5f); display: flex; align-items: center; justify-content: center; position: relative;">
-          <img v-if="post.image" :src="`http://localhost:8000/storage/${post.image}`" :alt="post.title" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
+          <img v-if="post.image" :src="getImageUrl(post.image)" :alt="post.title" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
           <span v-else style="font-size: 4rem;">📄</span>
           <div style="position: absolute; top: 12px; left: 12px; background: var(--color-accent); color: #000; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px;">Article</div>
         </div>
@@ -66,15 +66,22 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '../api';
 
 const posts = ref([]);
 const loading = ref(true);
 const selectedPost = ref(null);
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http')) return imagePath;
+  const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '') : 'http://localhost:8000';
+  return `${baseUrl}/storage/${imagePath}`;
+};
+
 onMounted(async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/posts');
+    const res = await api.get('/posts');
     posts.value = res.data;
   } catch (e) {
     console.error(e);

@@ -211,7 +211,7 @@ import Logo from './components/Logo.vue';
 import ToastContainer from './components/ToastContainer.vue';
 import ChatWidget from './components/ChatWidget.vue';
 import NotificationCenter from './components/NotificationCenter.vue';
-import axios from 'axios';
+import api from './api';
 import { 
   Search, 
   ShoppingCart, 
@@ -273,7 +273,7 @@ const subscribeNewsletter = async () => {
   if (!newsletterEmail.value) return;
   subscribing.value = true;
   try {
-    const res = await axios.post('http://localhost:8000/api/newsletter/subscribe', { email: newsletterEmail.value });
+    const res = await api.post('/newsletter/subscribe', { email: newsletterEmail.value });
     toastStore.showToast(res.data.message || 'Inscription réussie !', 'success');
     newsletterEmail.value = '';
   } catch (error) {
