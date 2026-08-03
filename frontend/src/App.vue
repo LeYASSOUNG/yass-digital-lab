@@ -71,15 +71,20 @@
             </span>
           </router-link>
 
-          <!-- Auth Button -->
+          <!-- Auth / Dashboard Buttons -->
           <router-link v-if="!auth.token" to="/login" class="btn btn-secondary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; border-color: var(--color-accent); color: var(--color-accent); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
             <LogIn :size="15" />
             <span>{{ t('login') }}</span>
           </router-link>
-          <router-link v-else to="/dashboard" class="btn btn-primary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-            <User :size="15" />
-            <span>{{ t('mySpace') }}</span>
-          </router-link>
+          <template v-else>
+            <router-link v-if="isAdmin" to="/admin" class="btn btn-primary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, #F0CC55, #D4AF37); color: #050811; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; border: none; box-shadow: 0 2px 10px rgba(212,175,55,0.3);">
+              ⚡ <span>Dashboard Admin</span>
+            </router-link>
+            <router-link to="/dashboard" class="btn btn-secondary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <User :size="15" />
+              <span>{{ t('mySpace') }}</span>
+            </router-link>
+          </template>
 
           <!-- Utility Group Pill (Notifs + FR/EN + Theme) -->
           <div class="flex items-center gap-1" style="background: rgba(255,255,255,0.05); padding: 3px; border-radius: 999px; border: 1px solid var(--color-border); white-space: nowrap;">
@@ -240,6 +245,11 @@ const isDark = ref(false);
 const newsletterEmail = ref('');
 const subscribing = ref(false);
 const mobileMenuOpen = ref(false);
+
+const isAdmin = computed(() => {
+  const allowedRoles = ['admin', 'super_admin', 'creator', 'editor', 'support'];
+  return auth.user && allowedRoles.includes(auth.user.role);
+});
 
 const searchQuery = ref('');
 const searchFocused = ref(false);
