@@ -19,4 +19,20 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+// Intercepteur pour gérer l'expiration des jetons (401 Unauthorized)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirection si sur une page protégée
+      if (window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/dashboard')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
