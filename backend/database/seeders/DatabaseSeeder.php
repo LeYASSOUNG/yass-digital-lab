@@ -34,9 +34,12 @@ class DatabaseSeeder extends Seeder
     private function seedUsers(): void
     {
         foreach ($this->getUserDefinitions() as $data) {
+            $password = $data['email'] === env('SUPER_ADMIN_EMAIL', 'superadmin@yassdigital.lab')
+                ? bcrypt(env('SUPER_ADMIN_PASSWORD', 'password'))
+                : bcrypt('password');
             User::firstOrCreate(
                 ['email' => $data['email']],
-                array_merge($data, ['password' => bcrypt('password')])
+                array_merge($data, ['password' => $password])
             );
         }
     }
@@ -46,8 +49,8 @@ class DatabaseSeeder extends Seeder
     {
         return [
             [
-                'email'   => 'superadmin@yassdigital.lab',
-                'name'    => 'Yass Super Admin',
+                'email'   => env('SUPER_ADMIN_EMAIL', 'superadmin@yassdigital.lab'),
+                'name'    => 'Diarrassouba Yassoungo Youssouf',
                 'role'    => 'super_admin',
                 'phone'   => '+33 6 00 11 22 33',
                 'company' => 'Yass Digital Lab HQ',
