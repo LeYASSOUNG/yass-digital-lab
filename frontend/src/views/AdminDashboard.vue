@@ -130,6 +130,27 @@
 
       </div>
 
+      <!-- Barre de Raccourcis Rapides Administrateur -->
+      <div class="glass mb-8 p-4 flex items-center justify-between gap-3" style="border-radius: 18px; background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.25); flex-wrap: wrap;">
+        <span style="font-weight: 800; font-size: 0.88rem; color: var(--color-accent); display: inline-flex; align-items: center; gap: 6px;">
+          ⚡ Raccourcis Administrateur :
+        </span>
+        <div class="flex items-center gap-2" style="flex-wrap: wrap;">
+          <button @click="activeTab = 'products'; showForm = true" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; font-weight: 700;">
+            + Nouveau Produit
+          </button>
+          <button @click="activeTab = 'coupons'; showCouponForm = true" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; font-weight: 700;">
+            🎟️ Créer Coupon
+          </button>
+          <button @click="activeTab = 'blog'; showPostForm = true" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; font-weight: 700;">
+            📝 Publier Article
+          </button>
+          <button @click="exportOrdersCSV" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; font-weight: 700;">
+            📊 Exporter CSV Ventes
+          </button>
+        </div>
+      </div>
+
       <!-- Graphique d'Analyse des Ventes -->
       <div class="mb-8">
         <SalesChart />
@@ -196,11 +217,14 @@
             <h3 style="font-size: 1.3rem; margin: 0; font-weight: 800;">👑 Gestion des Utilisateurs & Rôles System</h3>
             <p style="color: var(--color-text-light); font-size: 0.85rem; margin: 2px 0 0;">Attribuez des rôles (Client, Admin, Créateur, Éditeur, Support, Super Admin) en temps réel.</p>
           </div>
-          <div class="flex items-center gap-3">
-            <div style="position: relative; width: 240px;">
+          <div class="flex items-center gap-3" style="flex-wrap: wrap;">
+            <div style="position: relative; width: 220px;">
               <Search :size="14" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-light);" />
               <input v-model="searchUserQuery" type="text" placeholder="Rechercher nom, email..." style="width: 100%; padding: 6px 12px 6px 30px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: 0.82rem;" />
             </div>
+            <button @click="exportUsersCSV" class="btn btn-secondary flex items-center gap-1" style="padding: 6px 12px; font-size: 0.8rem;">
+              <Download :size="13" /> Exporter CSV
+            </button>
             <span style="background: rgba(212,175,55,0.15); color: var(--color-accent); padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 0.82rem; white-space: nowrap;">
               {{ filteredUsers.length }} utilisateur(s)
             </span>
@@ -285,11 +309,14 @@
             <h3 style="font-size: 1.3rem; margin: 0; font-weight: 800;">🛍️ Gestion des Produits & Ressources</h3>
             <p style="color: var(--color-text-light); font-size: 0.85rem; margin: 2px 0 0;">Gérez les packs, templates, e-books et outils au catalogue.</p>
           </div>
-          <div class="flex items-center gap-3">
-            <div style="position: relative; width: 220px;">
+          <div class="flex items-center gap-3" style="flex-wrap: wrap;">
+            <div style="position: relative; width: 200px;">
               <Search :size="14" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-light);" />
               <input v-model="searchProductQuery" type="text" placeholder="Rechercher produit..." style="width: 100%; padding: 6px 12px 6px 30px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: 0.82rem;" />
             </div>
+            <button @click="exportProductsCSV" class="btn btn-secondary flex items-center gap-1" style="padding: 6px 12px; font-size: 0.8rem;">
+              <Download :size="13" /> Exporter CSV
+            </button>
             <button @click="showForm = !showForm" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.88rem;">
               {{ showForm ? '✕ Annuler' : '+ Nouveau Produit' }}
             </button>
@@ -1050,6 +1077,42 @@ const exportOrdersCSV = () => {
   link.click();
   link.remove();
   toastStore.showToast('Export CSV des ventes téléchargé avec succès !', 'success');
+};
+
+const exportProductsCSV = () => {
+  if (products.value.length === 0) {
+    toastStore.showToast('Aucun produit à exporter.', 'info');
+    return;
+  }
+  const headers = ['ID', 'Titre', 'Type', 'Prix EUR', 'Date'];
+  const rows = products.value.map(p => [p.id, `"${p.title.replace(/"/g, '""')}"`, p.type, p.price, p.created_at || '']);
+  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `catalogue_produits_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  toastStore.showToast('Export CSV du catalogue produits téléchargé !', 'success');
+};
+
+const exportUsersCSV = () => {
+  if (usersList.value.length === 0) {
+    toastStore.showToast('Aucun utilisateur à exporter.', 'info');
+    return;
+  }
+  const headers = ['ID', 'Nom', 'Email', 'Role', 'Entreprise', 'Date'];
+  const rows = usersList.value.map(u => [u.id, `"${u.name.replace(/"/g, '""')}"`, u.email, u.role, `"${(u.company || '').replace(/"/g, '""')}"`, u.created_at || '']);
+  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `utilisateurs_systeme_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  toastStore.showToast('Export CSV des utilisateurs téléchargé !', 'success');
 };
 
 const generatePDFReport = () => {
