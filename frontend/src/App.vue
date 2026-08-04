@@ -14,11 +14,11 @@
     </div>
 
     <!-- Header Navigation Redesigned -->
-    <header translate="no" class="notranslate glass header-nav" style="padding: 0.75rem 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(28px); border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
-      <div class="container flex justify-between items-center gap-3">
+    <header translate="no" class="notranslate glass header-nav" style="padding: 0.6rem 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(28px); border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+      <div style="max-width: 1440px; margin: 0 auto; padding: 0 16px;" class="flex justify-between items-center gap-2">
         
         <!-- Official Logo (Compact Header Mode) -->
-        <Logo :size="36" :showTagline="false" />
+        <Logo :size="34" :showTagline="false" />
 
         <!-- Central Navigation Links -->
         <nav class="flex gap-1 items-center" id="main-nav">
@@ -34,9 +34,9 @@
         <div class="flex items-center gap-2" id="header-actions">
           
           <!-- Live Search Bar -->
-          <div style="position: relative; width: 170px;">
-            <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); display: flex; align-items: center; pointer-events: none;">
-              <Search :size="15" />
+          <div style="position: relative; width: 130px;" class="search-box">
+            <div style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); display: flex; align-items: center; pointer-events: none;">
+              <Search :size="14" />
             </div>
             <input 
               v-model="searchQuery" 
@@ -44,60 +44,60 @@
               @blur="setTimeout(() => searchFocused = false, 200)"
               type="text" 
               placeholder="Rechercher..." 
-              style="width: 100%; padding: 6px 14px 6px 32px; border-radius: 999px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: 0.82rem;"
+              style="width: 100%; padding: 5px 10px 5px 28px; border-radius: 999px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: 0.78rem;"
             />
 
             <!-- Dropdown Results -->
-            <div v-if="searchFocused && searchResults.length > 0" class="glass" style="position: absolute; top: 38px; right: 0; width: 250px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; background: var(--color-bg-card);">
+            <div v-if="searchFocused && searchResults.length > 0" class="glass" style="position: absolute; top: 36px; right: 0; width: 240px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; background: var(--color-bg-card);">
               <router-link 
                 v-for="res in searchResults" 
                 :key="res.id" 
                 :to="res.url"
                 class="flex items-center gap-2"
-                style="padding: 10px 14px; text-decoration: none; color: var(--color-text); border-bottom: 1px solid var(--color-border); font-size: 0.85rem;"
+                style="padding: 9px 12px; text-decoration: none; color: var(--color-text); border-bottom: 1px solid var(--color-border); font-size: 0.82rem;"
               >
-                <component :is="res.iconComponent" :size="16" style="color: var(--color-accent);" />
+                <component :is="res.iconComponent" :size="15" style="color: var(--color-accent);" />
                 <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ res.title }}</span>
               </router-link>
             </div>
           </div>
 
           <!-- Panier Pill -->
-          <router-link to="/checkout" class="cart-pill" style="position: relative; display: flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(212,175,55,0.12); border-radius: 999px; border: 1px solid rgba(212,175,55,0.3); font-weight: 700; color: var(--color-text); text-decoration: none; font-size: 0.82rem; white-space: nowrap;">
-            <ShoppingCart :size="16" style="color: var(--color-accent);" /> 
+          <router-link to="/checkout" class="cart-pill" style="position: relative; display: flex; align-items: center; gap: 5px; padding: 5px 11px; background: rgba(212,175,55,0.12); border-radius: 999px; border: 1px solid rgba(212,175,55,0.3); font-weight: 700; color: var(--color-text); text-decoration: none; font-size: 0.78rem; white-space: nowrap;">
+            <ShoppingCart :size="15" style="color: var(--color-accent);" /> 
             <span>{{ t('cart') }}</span>
-            <span v-if="cart.totalItems > 0" style="background: var(--color-accent); color: #050811; border-radius: 50%; width: 18px; height: 18px; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: 2px;">
+            <span v-if="cart.totalItems > 0" style="background: var(--color-accent); color: #050811; border-radius: 50%; width: 17px; height: 17px; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: 2px;">
               {{ cart.totalItems }}
             </span>
           </router-link>
 
           <!-- Auth / Dashboard Buttons -->
-          <router-link v-if="!auth.token" to="/login" class="btn btn-secondary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; border-color: var(--color-accent); color: var(--color-accent); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-            <LogIn :size="15" />
+          <router-link v-if="!auth.token" to="/login" class="btn btn-secondary" style="padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; border-color: var(--color-accent); color: var(--color-accent); font-weight: 700; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+            <LogIn :size="14" />
             <span>{{ t('login') }}</span>
           </router-link>
           <template v-else>
-            <router-link v-if="isAdmin" to="/admin" class="btn btn-primary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, #F0CC55, #D4AF37); color: #050811; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; border: none; box-shadow: 0 2px 10px rgba(212,175,55,0.3);">
+            <router-link v-if="isAdmin" to="/admin" class="btn btn-primary" style="padding: 5px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #F0CC55, #D4AF37); color: #050811; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; border: none; box-shadow: 0 2px 10px rgba(212,175,55,0.3);">
               ⚡ <span>Dashboard Admin</span>
             </router-link>
-            <router-link to="/dashboard" class="btn btn-secondary" style="padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-              <User :size="15" />
+            <router-link to="/dashboard" class="btn btn-secondary" style="padding: 5px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+              <User :size="14" />
               <span>{{ t('mySpace') }}</span>
             </router-link>
           </template>
 
           <!-- Utility Group Pill (Notifs + FR/EN + Theme) -->
-          <div class="flex items-center gap-1" style="background: rgba(255,255,255,0.05); padding: 3px; border-radius: 999px; border: 1px solid var(--color-border); white-space: nowrap;">
+          <div class="flex items-center gap-1" style="background: rgba(255,255,255,0.05); padding: 2px 4px; border-radius: 999px; border: 1px solid var(--color-border); white-space: nowrap;">
             <NotificationCenter />
             
-            <button @click="handleToggleLang" title="Langue" style="background: none; border: none; padding: 4px 8px; font-size: 0.78rem; font-weight: 800; cursor: pointer; color: var(--color-text); display: inline-flex; align-items: center; gap: 4px;">
-              <Globe :size="14" style="color: var(--color-accent);" />
+            <button @click="handleToggleLang" title="Langue" style="background: none; border: none; padding: 3px 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; color: var(--color-text); display: inline-flex; align-items: center; gap: 3px;">
+              <Globe :size="13" style="color: var(--color-accent);" />
               {{ currentLang === 'fr' ? 'FR' : 'EN' }}
             </button>
 
-            <button @click="toggleTheme" title="Changer le thème" style="background: none; border: none; width: 28px; height: 28px; cursor: pointer; color: var(--color-accent); display: flex; align-items: center; justify-content: center;">
-              <Sun v-if="isDark" :size="16" />
-              <Moon v-else :size="16" />
+            <button @click="toggleTheme" title="Changer le thème" style="background: none; border: none; width: 26px; height: 26px; cursor: pointer; color: var(--color-accent); display: flex; align-items: center; justify-content: center;">
+              <Sun v-if="isDark" :size="15" />
+              <Moon v-else :size="15" />
             </button>
           </div>
 
@@ -314,12 +314,12 @@ onMounted(() => {
   min-height: 100vh;
 }
 .nav-link {
-  padding: 6px 12px;
+  padding: 4px 9px;
   border-radius: 999px;
   color: var(--color-text);
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   white-space: nowrap !important;
   display: inline-block;
   transition: all 0.2s;
@@ -327,6 +327,12 @@ onMounted(() => {
 .nav-link:hover, .nav-link.router-link-active {
   color: var(--color-accent);
   background: rgba(212, 175, 55, 0.12);
+}
+.search-box {
+  transition: width 0.3s ease;
+}
+.search-box:focus-within {
+  width: 165px !important;
 }
 .cart-pill:hover {
   background: rgba(212, 175, 55, 0.22) !important;
@@ -341,7 +347,7 @@ onMounted(() => {
 .footer-link:hover {
   color: var(--color-accent);
 }
-@media (max-width: 1100px) {
+@media (max-width: 1280px) {
   #main-nav { display: none; }
   #header-actions { display: none; }
   .burger-btn { display: block !important; }
