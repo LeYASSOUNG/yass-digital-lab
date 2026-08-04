@@ -62,44 +62,72 @@
     <!-- TAB 1 : VUE D'ENSEMBLE -->
     <div v-if="activeTab === 'overview'" class="fade-in">
       <!-- Cartes KPIs avec Tendances -->
-      <div class="grid mb-8" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
-        <div class="glass p-5 flex flex-col justify-between" style="border-radius: 18px; border-left: 4px solid var(--color-accent);">
-          <div class="flex justify-between items-center mb-2">
-            <p style="color: var(--color-text-light); font-size: 0.88rem; margin: 0; font-weight: 600;">Revenu Total</p>
-            <DollarSign :size="20" style="color: var(--color-accent);" />
+      <div class="grid mb-8" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px;">
+        
+        <!-- KPI 1 : Revenu Total -->
+        <div class="glass" style="padding: 24px 26px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid var(--color-accent); background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="flex justify-between items-center mb-3">
+            <span style="color: var(--color-text-light); font-size: 0.88rem; font-weight: 700;">Revenu Total</span>
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <DollarSign :size="20" style="color: var(--color-accent);" />
+            </div>
           </div>
-          <h2 style="color: var(--color-accent); font-size: 2rem; font-weight: 800; margin-bottom: 4px;">{{ totalRevenue.toFixed(2) }} €</h2>
-          <span style="font-size: 0.76rem; color: #22c55e; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-            <TrendingUp :size="13" /> +15.4% vs mois dernier
-          </span>
+          <h2 style="color: var(--color-text); font-size: 2.1rem; font-weight: 800; margin: 4px 0 10px; font-family: var(--font-heading);">{{ totalRevenue.toFixed(2) }} €</h2>
+          <div>
+            <span style="font-size: 0.76rem; color: #10b981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); padding: 4px 10px; border-radius: 999px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              <TrendingUp :size="13" /> +15.4% vs mois dernier
+            </span>
+          </div>
         </div>
 
-        <div class="glass p-5 flex flex-col justify-between" style="border-radius: 18px; border-left: 4px solid #3b82f6;">
-          <div class="flex justify-between items-center mb-2">
-            <p style="color: var(--color-text-light); font-size: 0.88rem; margin: 0; font-weight: 600;">Commandes</p>
-            <ShoppingBag :size="20" style="color: #3b82f6;" />
+        <!-- KPI 2 : Commandes -->
+        <div class="glass" style="padding: 24px 26px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #3b82f6; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="flex justify-between items-center mb-3">
+            <span style="color: var(--color-text-light); font-size: 0.88rem; font-weight: 700;">Commandes</span>
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <ShoppingBag :size="20" style="color: #3b82f6;" />
+            </div>
           </div>
-          <h2 style="color: #3b82f6; font-size: 2rem; font-weight: 800; margin-bottom: 4px;">{{ orders.length }}</h2>
-          <span style="font-size: 0.76rem; color: #3b82f6; font-weight: 700;">{{ orders.filter(o => o.status === 'paid').length }} payées</span>
+          <h2 style="color: var(--color-text); font-size: 2.1rem; font-weight: 800; margin: 4px 0 10px; font-family: var(--font-heading);">{{ orders.length }}</h2>
+          <div>
+            <span style="font-size: 0.76rem; color: #3b82f6; background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); padding: 4px 10px; border-radius: 999px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              <CheckCircle2 :size="13" /> {{ orders.filter(o => o.status === 'paid').length }} payée(s)
+            </span>
+          </div>
         </div>
 
-        <div class="glass p-5 flex flex-col justify-between" style="border-radius: 18px; border-left: 4px solid #22c55e;">
-          <div class="flex justify-between items-center mb-2">
-            <p style="color: var(--color-text-light); font-size: 0.88rem; margin: 0; font-weight: 600;">Catalogue Produits</p>
-            <Package :size="20" style="color: #22c55e;" />
+        <!-- KPI 3 : Catalogue Produits -->
+        <div class="glass" style="padding: 24px 26px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #10b981; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="flex justify-between items-center mb-3">
+            <span style="color: var(--color-text-light); font-size: 0.88rem; font-weight: 700;">Catalogue Produits</span>
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <Package :size="20" style="color: #10b981;" />
+            </div>
           </div>
-          <h2 style="color: #22c55e; font-size: 2rem; font-weight: 800; margin-bottom: 4px;">{{ products.length }}</h2>
-          <span style="font-size: 0.76rem; color: #22c55e; font-weight: 700;">Prêts au téléchargement</span>
+          <h2 style="color: var(--color-text); font-size: 2.1rem; font-weight: 800; margin: 4px 0 10px; font-family: var(--font-heading);">{{ products.length }}</h2>
+          <div>
+            <span style="font-size: 0.76rem; color: #10b981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); padding: 4px 10px; border-radius: 999px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              ⚡ Prêts au téléchargement
+            </span>
+          </div>
         </div>
 
-        <div class="glass p-5 flex flex-col justify-between" style="border-radius: 18px; border-left: 4px solid #a855f7;">
-          <div class="flex justify-between items-center mb-2">
-            <p style="color: var(--color-text-light); font-size: 0.88rem; margin: 0; font-weight: 600;">Abonnés Newsletter</p>
-            <Mail :size="20" style="color: #a855f7;" />
+        <!-- KPI 4 : Abonnés Newsletter -->
+        <div class="glass" style="padding: 24px 26px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #a855f7; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="flex justify-between items-center mb-3">
+            <span style="color: var(--color-text-light); font-size: 0.88rem; font-weight: 700;">Abonnés Newsletter</span>
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <Mail :size="20" style="color: #a855f7;" />
+            </div>
           </div>
-          <h2 style="color: #a855f7; font-size: 2rem; font-weight: 800; margin-bottom: 4px;">{{ subscribers.length }}</h2>
-          <span style="font-size: 0.76rem; color: #a855f7; font-weight: 700;">Audience active</span>
+          <h2 style="color: var(--color-text); font-size: 2.1rem; font-weight: 800; margin: 4px 0 10px; font-family: var(--font-heading);">{{ subscribers.length }}</h2>
+          <div>
+            <span style="font-size: 0.76rem; color: #a855f7; background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); padding: 4px 10px; border-radius: 999px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              📧 Audience active
+            </span>
+          </div>
         </div>
+
       </div>
 
       <!-- Graphique d'Analyse des Ventes -->
