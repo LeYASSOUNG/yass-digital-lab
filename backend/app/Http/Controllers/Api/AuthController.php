@@ -37,38 +37,50 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // Validation stricte des données d'inscription
-        $validated = $request->validate([
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email|unique:users,email', // L'email doit être unique en base
-            'password'=> 'required|string|min:6',
-            'phone'   => 'nullable|string|max:30',
-            'company' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:500',
-        ], [
-            'email.unique' => 'Cet email est déjà utilisé par un autre compte.'
-        ]);
+        try {
+            // Validation stricte des données d'inscription
+            $validated = $request->validate([
+                'name'    => 'required|string|max:255',
+                'email'   => 'required|email|unique:users,email', // L'email doit être unique en base
+                'password'=> 'required|string|min:6',
+                'phone'   => 'nullable|string|max:30',
+                'company' => 'nullable|string|max:255',
+                'address' => 'nullable|string|max:500',
+            ], [
+                'email.unique' => 'Cet email est déjà utilisé par un autre compte.'
+            ]);
 
-        // Création de l'utilisateur avec mot de passe hashé (bcrypt)
-        $user = User::create([
-            'name'    => $validated['name'],
-            'email'   => $validated['email'],
-            'password'=> Hash::make($validated['password']), // Sécurisation du mot de passe
-            'role'    => 'client',                           // Rôle par défaut = client
-            'phone'   => $validated['phone']   ?? null,
-            'company' => $validated['company'] ?? null,
-            'address' => $validated['address'] ?? null,
-        ]);
+            // Création de l'utilisateur avec mot de passe hashé (bcrypt)
+            $user = User::create([
+                'name'    => $validated['name'],
+                'email'   => $validated['email'],
+                'password'=> Hash::make($validated['password']), // Sécurisation du mot de passe
+                'role'    => 'client',                           // Rôle par défaut = client
+                'phone'   => $validated['phone']   ?? null,
+                'company' => $validated['company'] ?? null,
+                'address' => $validated['address'] ?? null,
+            ]);
 
-        // Génération du token d'authentification API (Sanctum)
-        $token = $user->createToken('auth_token')->plainTextToken;
+            // Génération du token d'authentification API (Sanctum)
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type'   => 'Bearer',
-            'user'         => $user,
-            'message'      => 'Compte client créé avec succès'
-        ], 201);
+            return response()->json([
+                'access_token' => $token,
+                'token_type'   => 'Bearer',
+                'user'         => $user,
+                'message'      => 'Compte client créé avec succès'
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Erreur de validation',
+                'errors'  => $e->errors()
+            ], 422);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Erreur Register: '.$e->getMessage());
+            return response()->json([
+                'message' => 'Erreur serveur lors de l\'inscription: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -82,28 +94,40 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // Validation minimale des champs de connexion
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required'
-        ]);
-
-        // Tentative d'authentification via les guards Laravel
-        if (Auth::attempt($credentials)) {
-            $user  = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'access_token' => $token,
-                'token_type'   => 'Bearer',
-                'user'         => $user
+        try {
+            // Validation minimale des champs de connexion
+            $credentials = $request->validate([
+                'email'    => 'required|email',
+                'password' => 'required'
             ]);
-        }
 
-        // Retour 401 si les identifiants sont invalides
-        return response()->json([
-            'message' => 'Identifiants invalides'
-        ], 401);
+            // Tentative d'authentification via les guards Laravel
+            if (Auth::attempt($credentials)) {
+                $user  = Auth::user();
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return response()->json([
+                    'access_token' => $token,
+                    'token_type'   => 'Bearer',
+                    'user'         => $user
+                ]);
+            }
+
+            // Retour 401 si les identifiants sont invalides
+            return response()->json([
+                'message' => 'Identifiants invalides'
+            ], 401);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Erreur de validation',
+                'errors'  => $e->errors()
+            ], 422);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Erreur Login: '.$e->getMessage());
+            return response()->json([
+                'message' => 'Erreur serveur lors de la connexion: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
