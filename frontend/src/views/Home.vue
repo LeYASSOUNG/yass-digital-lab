@@ -39,33 +39,36 @@
 
     <!-- Key Statistics -->
     <section class="grid mb-16" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;">
-      <div class="glass glass-hover text-center" style="padding: 28px 24px; border-radius: 20px;">
-        <div style="margin-bottom: 12px; display: flex; justify-content: center; color: var(--color-accent);">
-          <Package :size="36" />
+      <div class="glass glass-hover text-center" style="padding: 26px 20px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid var(--color-accent); background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="margin-bottom: 12px; display: inline-flex; width: 50px; height: 50px; border-radius: 14px; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); align-items: center; justify-content: center; color: var(--color-accent);">
+          <Package :size="26" />
         </div>
-        <h2 style="color: var(--color-accent); font-size: 2.5rem; font-weight: 800;">50+</h2>
-        <p style="color: var(--color-text-light); font-weight: 600; font-size: 0.9rem;">Produits & Templates</p>
+        <h2 style="color: var(--color-text); font-size: 2.3rem; font-weight: 800; margin: 4px 0 2px; font-family: var(--font-heading);">50+</h2>
+        <p style="color: var(--color-text-light); font-weight: 700; font-size: 0.88rem;">Produits & Templates</p>
       </div>
-      <div class="glass glass-hover text-center" style="padding: 28px 24px; border-radius: 20px;">
-        <div style="margin-bottom: 12px; display: flex; justify-content: center; color: var(--color-accent);">
-          <Zap :size="36" />
+
+      <div class="glass glass-hover text-center" style="padding: 26px 20px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #10b981; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="margin-bottom: 12px; display: inline-flex; width: 50px; height: 50px; border-radius: 14px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); align-items: center; justify-content: center; color: #10b981;">
+          <Zap :size="26" />
         </div>
-        <h2 style="color: var(--color-accent); font-size: 2.5rem; font-weight: 800;">100%</h2>
-        <p style="color: var(--color-text-light); font-weight: 600; font-size: 0.9rem;">Accès Instantané</p>
+        <h2 style="color: var(--color-text); font-size: 2.3rem; font-weight: 800; margin: 4px 0 2px; font-family: var(--font-heading);">100%</h2>
+        <p style="color: var(--color-text-light); font-weight: 700; font-size: 0.88rem;">Accès Instantané 24/7</p>
       </div>
-      <div class="glass glass-hover text-center" style="padding: 28px 24px; border-radius: 20px;">
-        <div style="margin-bottom: 12px; display: flex; justify-content: center; color: var(--color-accent);">
-          <Users :size="36" />
+
+      <div class="glass glass-hover text-center" style="padding: 26px 20px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #3b82f6; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="margin-bottom: 12px; display: inline-flex; width: 50px; height: 50px; border-radius: 14px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); align-items: center; justify-content: center; color: #3b82f6;">
+          <Users :size="26" />
         </div>
-        <h2 style="color: var(--color-accent); font-size: 2.5rem; font-weight: 800;">200+</h2>
-        <p style="color: var(--color-text-light); font-weight: 600; font-size: 0.9rem;">Clients Satisfaits</p>
+        <h2 style="color: var(--color-text); font-size: 2.3rem; font-weight: 800; margin: 4px 0 2px; font-family: var(--font-heading);">200+</h2>
+        <p style="color: var(--color-text-light); font-weight: 700; font-size: 0.88rem;">Clients Satisfaits</p>
       </div>
-      <div class="glass glass-hover text-center" style="padding: 28px 24px; border-radius: 20px;">
-        <div style="margin-bottom: 12px; display: flex; justify-content: center; color: var(--color-accent);">
-          <Star :size="36" />
+
+      <div class="glass glass-hover text-center" style="padding: 26px 20px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #a855f7; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="margin-bottom: 12px; display: inline-flex; width: 50px; height: 50px; border-radius: 14px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); align-items: center; justify-content: center; color: #a855f7;">
+          <Star :size="26" />
         </div>
-        <h2 style="color: var(--color-accent); font-size: 2.5rem; font-weight: 800;">5.0 / 5</h2>
-        <p style="color: var(--color-text-light); font-weight: 600; font-size: 0.9rem;">Satisfaction Garantie</p>
+        <h2 style="color: var(--color-text); font-size: 2.3rem; font-weight: 800; margin: 4px 0 2px; font-family: var(--font-heading);">5.0 / 5</h2>
+        <p style="color: var(--color-text-light); font-weight: 700; font-size: 0.88rem;">Satisfaction Garantie</p>
       </div>
     </section>
 
