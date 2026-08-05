@@ -34,7 +34,12 @@ const routes = [
   { path: '/verify-email',        name: 'VerifyEmail',        component: VerifyEmail },
 
   // Routes protégées — nécessitent une session active
-  { path: '/admin',         name: 'AdminDashboard',  component: AdminDashboard,  meta: { requiresAuth: true, requiresAdmin: true } },
+  {
+    path: '/admin',
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
   { path: '/dashboard',     name: 'ClientDashboard', component: ClientDashboard, meta: { requiresAuth: true } },
   { path: '/notifications', name: 'Notifications',   component: Notifications,   meta: { requiresAuth: true } },
 

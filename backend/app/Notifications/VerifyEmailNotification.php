@@ -23,8 +23,8 @@ class VerifyEmailNotification extends Notification
             'verification.verify',
             Carbon::now()->addMinutes(60),
             [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
+                'id'   => $notifiable->getKey(),
+                'hash' => hash('sha256', $notifiable->getEmailForVerification()),
             ]
         );
 
@@ -34,7 +34,8 @@ class VerifyEmailNotification extends Notification
         return (new MailMessage)
             ->subject('Vérifiez votre adresse email - Yass Digital Lab')
             ->greeting('Bienvenue ' . $notifiable->name . ' !')
-            ->line('Merci de vous être inscrit sur Yass Digital Lab. Veuillez cliquer sur le bouton ci-dessous pour vérifier votre adresse email.')
+            ->line('Merci de vous être inscrit sur Yass Digital Lab. ' .
+                  'Veuillez cliquer sur le bouton ci-dessous pour vérifier votre adresse email.')
             ->action('Vérifier mon adresse email', $verifyUrl)
             ->line('Si vous n\'avez pas créé de compte, vous pouvez ignorer cet email.');
     }

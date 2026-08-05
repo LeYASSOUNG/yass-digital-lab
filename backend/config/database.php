@@ -3,8 +3,9 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
-/** Version ID de PHP 8.5.0 utilisé pour choisir la constante SSL correcte */
-const PHP_8_5_VERSION_ID = 80500;
+if (!defined('PHP_8_5_VERSION_ID')) {
+    define('PHP_8_5_VERSION_ID', 80500);
+}
 
 return [
 
@@ -91,7 +92,10 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => (env('DB_HOST') && (str_starts_with(env('DB_HOST'), 'postgres://') || str_starts_with(env('DB_HOST'), 'postgresql://')))
+            'url' => (env('DB_HOST') && (
+                str_starts_with(env('DB_HOST'), 'postgres://') ||
+                str_starts_with(env('DB_HOST'), 'postgresql://')
+            ))
                 ? env('DB_HOST')
                 : (env('DATABASE_URL') ?: env('DB_URL')),
             'host' => (env('DB_HOST') && !str_contains(env('DB_HOST'), '://')) ? env('DB_HOST') : '127.0.0.1',

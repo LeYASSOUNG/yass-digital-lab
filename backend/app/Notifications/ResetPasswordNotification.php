@@ -30,7 +30,8 @@ class ResetPasswordNotification extends Notification
         return (new MailMessage)
             ->subject('Réinitialisation de votre mot de passe - Yass Digital Lab')
             ->greeting('Bonjour ' . $notifiable->name . ',')
-            ->line('Vous recevez cet email car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.')
+            ->line('Vous recevez cet email car nous avons reçu une demande de ' .
+                  'réinitialisation de mot de passe pour votre compte.')
             ->action('Réinitialiser mon mot de passe', $resetUrl)
             ->line('Ce lien de réinitialisation expirera dans 60 minutes.')
             ->line('Si vous n\'avez pas demandé cette réinitialisation, aucune action n\'est requise.');
