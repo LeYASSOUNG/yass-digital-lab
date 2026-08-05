@@ -143,7 +143,8 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'Si cette adresse email est enregistrée dans notre système, vous recevrez un lien de réinitialisation de mot de passe d\'ici quelques instants.'
+            'message' => 'Si cette adresse email est enregistrée dans notre système, ' .
+                         'vous recevrez un lien de réinitialisation d\'ici quelques instants.'
         ]);
     }
 
@@ -180,7 +181,8 @@ class AuthController extends Controller
 
         if ($status === Password::PASSWORD_RESET) {
             return response()->json([
-                'message' => 'Votre mot de passe a été réinitialisé avec succès. Veuillez vous re-connecter avec vos nouveaux identifiants.'
+                'message' => 'Votre mot de passe a été réinitialisé avec succès. ' .
+                             'Veuillez vous re-connecter avec vos nouveaux identifiants.'
             ]);
         }
 
@@ -196,7 +198,8 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($request->route('id'));
 
-        if (!hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+        $expectedHash = hash('sha256', $user->getEmailForVerification());
+        if (!hash_equals((string) $request->route('hash'), $expectedHash)) {
             return response()->json(['message' => 'Lien de vérification invalide ou altéré.'], 403);
         }
 

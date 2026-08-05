@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const HTTP_STATUS_UNAUTHORIZED = 401;
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: {
@@ -23,8 +25,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      const isProtectedRoute = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/dashboard');
+    if (error.response && error.response.status === HTTP_STATUS_UNAUTHORIZED) {
+      const path = window.location.pathname;
+      const isProtectedRoute = path.startsWith('/admin') || path.startsWith('/dashboard');
       // On ne nettoie les jetons que si l'utilisateur est sur une page protégée
       if (isProtectedRoute) {
         localStorage.removeItem('token');
