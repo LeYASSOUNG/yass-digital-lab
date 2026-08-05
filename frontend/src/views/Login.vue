@@ -138,9 +138,9 @@
           <div>
             <div class="flex justify-between items-center mb-1">
               <label style="font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Mot de passe</label>
-              <button type="button" @click="showForgotModal = true" style="background: none; border: none; color: var(--color-accent); font-size: 0.82rem; cursor: pointer; text-decoration: underline; font-weight: 600;">
+              <router-link to="/forgot-password" style="color: var(--color-accent); font-size: 0.82rem; text-decoration: underline; font-weight: 600;">
                 Mot de passe oublié ?
-              </button>
+              </router-link>
             </div>
             <div style="position: relative;">
               <div style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); pointer-events: none; display: flex; align-items: center;">

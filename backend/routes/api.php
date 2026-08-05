@@ -5,17 +5,8 @@
  * Routes API — Yass Digital Lab
  * ============================================================
  * Définition de toutes les routes de l'API REST Laravel.
- * Séparées en trois blocs :
- *
- *   1. Routes d'authentification (publiques)
- *   2. Routes publiques (accessibles sans token)
- *   3. Routes protégées (nécessitent un token Sanctum valide)
- *   4. Routes de paiement (partiellement publiques)
- *
- * Toutes les routes retournent du JSON (application/json).
- * Les erreurs sont au format : {"message": "..."}
- *
- * Base URL : http://localhost:8000/api/
+ * Sécurisées avec RBAC, URLs signées anti-IDOR, Webhook Stripe,
+ * Rate Limiting et réinitialisation de mot de passe.
  * ============================================================
  */
 
@@ -34,120 +25,129 @@ use App\Http\Controllers\Api\QuoteRequestController;
 use App\Http\Controllers\Api\ReviewController;
 
 // ============================================================
-// BLOC 1 : Authentification (Public — aucun token requis)
+// BLOC 1 : Authentification & Mot de passe (Rate Limited)
 // ============================================================
 
-// Inscription d'un nouveau compte client
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('throttle:6,1')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+});
 
-// Connexion et récupération du token Bearer
-Route::post('/register', [AuthController::class, 'register']);
+// Vérification d'email via URL signée (nom de route : verification.verify)
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->name('verification.verify');
 
 
 // ============================================================
-// BLOC 2 : Routes publiques (sans authentification)
+// BLOC 2 : Routes publiques (Consultation catalogue & Webhooks)
 // ============================================================
 
 // --- Produits ---
-Route::get('/products', [ProductController::class, 'index']);         // Liste tous les produits
-Route::get('/products/{id}', [ProductController::class, 'show']);     // Détail d'un produit
-Route::post('/products/{id}/reviews', [ProductController::class, 'addReview']); // Ajouter un avis
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::post('/products/{id}/reviews', [ProductController::class, 'addReview']);
 
 // --- Services ---
-Route::get('/services', [ServiceController::class, 'index']);          // Liste des services proposés
+Route::get('/services', [ServiceController::class, 'index']);
 
 // --- Blog ---
-Route::get('/posts', [PostController::class, 'index']);                // Articles publiés
-Route::get('/posts/{slug}', [PostController::class, 'show']);          // Article par son slug SEO
-
-// --- Commandes (facture publique pour téléchargement après paiement) ---
-Route::get('/orders/{id}/invoice', [OrderController::class, 'downloadInvoice']); // Téléchargement PDF
+Route::get('/posts', [PostController::class, 'index']);
+Route::get('/posts/{slug}', [PostController::class, 'show']);
 
 // --- Newsletter ---
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']); // Inscription newsletter
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
 
-// --- Coupons (validation publique au checkout) ---
-Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);    // Valider un code promo
+// --- Coupons ---
+Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
 
-// --- Demandes de devis (formulaire public) ---
-Route::post('/quote-requests', [QuoteRequestController::class, 'store']);         // Soumettre une demande
+// --- Demandes de devis ---
+Route::post('/quote-requests', [QuoteRequestController::class, 'store']);
+
+// --- Paiement Stripe Checkout & Webhook ---
+Route::post('/create-checkout-session', [PaymentController::class, 'createCheckoutSession']);
+Route::post('/stripe/webhook', [PaymentController::class, 'handleWebhook']);
+
+// --- Suivi de commande post-paiement (polling) ---
+Route::get('/orders/by-session/{sessionId}', [OrderController::class, 'showBySession']);
+
+// --- Facture PDF Client (URL temporaire signée obligatoire ou propriétaire) ---
+Route::get('/orders/{id}/invoice', [OrderController::class, 'downloadInvoice'])
+    ->name('orders.invoice');
 
 
 // ============================================================
-// BLOC 3 : Routes protégées (token Sanctum obligatoire)
+// BLOC 3 : Routes protégées Utilisateurs (token Sanctum valide)
 // ============================================================
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // --- Profil utilisateur connecté ---
     Route::get('/user', function (Request $request) {
-        // Retourne les données de l'utilisateur authentifié
         return $request->user();
     });
-    Route::put('/user/profile', [UserController::class, 'updateProfile']); // Modifier son profil
-    Route::post('/logout', [AuthController::class, 'logout']);              // Déconnexion (révoque le token)
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Renvoi du lien de vérification d'email
+    Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationNotification'])
+        ->middleware('throttle:6,1');
 
     // -------------------------------------------------------
-    // CRUD Admin — Produits
+    // Routes Admin / Créateur — Produits
     // -------------------------------------------------------
-    Route::post('/products', [ProductController::class, 'store']);       // Créer un produit
-    Route::put('/products/{id}', [ProductController::class, 'update']); // Modifier un produit
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
+    Route::middleware('role:admin,creator,super_admin')->group(function () {
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    });
 
     // -------------------------------------------------------
-    // Commandes (lecture Admin)
+    // Routes Admin / Support — Commandes & Factures
     // -------------------------------------------------------
-    Route::get('/orders', [OrderController::class, 'index']);            // Liste toutes les commandes
-    Route::get('/orders/{id}', [OrderController::class, 'show']);        // Détail d'une commande
-    Route::get('/orders/{id}/invoice', [OrderController::class, 'downloadInvoice']); // Facture PDF (Admin)
+    Route::middleware('role:admin,creator,support,super_admin')->group(function () {
+        Route::get('/orders', [OrderController::class, 'index']);
+        Route::get('/orders/{id}', [OrderController::class, 'show']);
+        Route::get('/admin/orders/{id}/invoice', [OrderController::class, 'downloadInvoiceAdmin']);
+    });
 
     // -------------------------------------------------------
-    // CRUD Admin — Coupons de réduction
+    // Routes Admin — Coupons de réduction
     // -------------------------------------------------------
-    Route::post('/coupons', [CouponController::class, 'store']);         // Créer un coupon
-    Route::get('/coupons', [CouponController::class, 'index']);          // Liste tous les coupons
-    Route::put('/coupons/{id}', [CouponController::class, 'update']);   // Modifier un coupon
-    Route::delete('/coupons/{id}', [CouponController::class, 'destroy']); // Supprimer un coupon
+    Route::middleware('role:admin,super_admin')->group(function () {
+        Route::post('/coupons', [CouponController::class, 'store']);
+        Route::get('/coupons', [CouponController::class, 'index']);
+        Route::put('/coupons/{id}', [CouponController::class, 'update']);
+        Route::delete('/coupons/{id}', [CouponController::class, 'destroy']);
+    });
 
     // -------------------------------------------------------
-    // CRUD Admin — Articles de blog
+    // Routes Admin / Rédacteur — Blog
     // -------------------------------------------------------
-    Route::post('/posts', [PostController::class, 'store']);             // Créer un article
-    Route::put('/posts/{id}', [PostController::class, 'update']);       // Modifier un article
-    Route::delete('/posts/{id}', [PostController::class, 'destroy']);   // Supprimer un article
-
-    // --- Newsletter (lecture Admin) ---
-    Route::get('/newsletter', [NewsletterController::class, 'index']);   // Liste des abonnés
-
-    // -------------------------------------------------------
-    // Demandes de devis (gestion Admin)
-    // -------------------------------------------------------
-    Route::get('/quote-requests', [QuoteRequestController::class, 'index']);              // Liste des demandes
-    Route::put('/quote-requests/{id}/status', [QuoteRequestController::class, 'updateStatus']); // Changer le statut
-    Route::delete('/quote-requests/{id}', [QuoteRequestController::class, 'destroy']);   // Supprimer une demande
+    Route::middleware('role:admin,editor,super_admin')->group(function () {
+        Route::post('/posts', [PostController::class, 'store']);
+        Route::put('/posts/{id}', [PostController::class, 'update']);
+        Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+    });
 
     // -------------------------------------------------------
-    // Avis clients (gestion Admin)
+    // Routes Admin / Support — Devis, Avis & Newsletter
     // -------------------------------------------------------
-    Route::get('/reviews', [ReviewController::class, 'index']);          // Liste tous les avis
-    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']); // Supprimer un avis
+    Route::middleware('role:admin,support,super_admin')->group(function () {
+        Route::get('/newsletter', [NewsletterController::class, 'index']);
+        Route::get('/quote-requests', [QuoteRequestController::class, 'index']);
+        Route::put('/quote-requests/{id}/status', [QuoteRequestController::class, 'updateStatus']);
+        Route::delete('/quote-requests/{id}', [QuoteRequestController::class, 'destroy']);
+        Route::get('/reviews', [ReviewController::class, 'index']);
+        Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+    });
 
     // -------------------------------------------------------
-    // Super Admin — Gestion des utilisateurs
+    // Routes réservées au Super Admin (Gestion des utilisateurs)
     // -------------------------------------------------------
-    Route::get('/users', [UserController::class, 'index']);              // Liste tous les utilisateurs
-    Route::put('/users/{id}/role', [UserController::class, 'updateRole']); // Changer le rôle d'un user
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);   // Supprimer un utilisateur
+    Route::middleware('role:super_admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::put('/users/{id}/role', [UserController::class, 'updateRole']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    });
 });
-
-
-// ============================================================
-// BLOC 4 : Routes de paiement Stripe (partiellement publiques)
-// ============================================================
-
-// Création d'une session de paiement Stripe (appelé depuis le frontend au checkout)
-Route::post('/create-checkout-session', [PaymentController::class, 'createCheckoutSession']);
-
-// Création de commande après paiement réussi (public car déclenché par le frontend post-Stripe)
-// ⚠️ La sécurité est assurée par la vérification de stripe_session_id côté Stripe
-Route::post('/orders', [OrderController::class, 'store']);
