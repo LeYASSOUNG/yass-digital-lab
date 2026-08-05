@@ -377,6 +377,7 @@ import { useAuthStore } from '../stores/auth';
 import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
 import { useRouter } from 'vue-router';
+import api from '../api';
 import { ref, computed, onMounted } from 'vue';
 import { 
   User, 
@@ -429,24 +430,32 @@ const passwordStrength = computed(() => {
   return { label: 'Très Fort 💪', pct: 100, color: '#10b981' };
 });
 
-const purchases = ref([
-  {
-    id: 101,
-    order_id: 1001,
-    title: 'Template SaaS Starter Vue 3 + Laravel 12',
-    date: '28/07/2026',
-    licenseKey: 'YASS-SaaS-99201-PRO',
-    downloadUrl: '/downloads/saas-template.zip'
-  },
-  {
-    id: 102,
-    order_id: 1002,
-    title: 'Mega Pack Prompts ChatGPT & Claude 3.5',
-    date: '25/07/2026',
-    licenseKey: 'YASS-PROMPTS-44102-VIP',
-    downloadUrl: '/downloads/prompts-pack.zip'
+const purchases = ref([]);
+const loadingPurchases = ref(true);
+
+const loadPurchases = async () => {
+  loadingPurchases.value = true;
+  try {
+    const res = await api.get('/orders?all=true');
+    const orders = Array.isArray(res.data) ? res.data : (res.data.data || []);
+    // Filtrer uniquement les commandes payées appartenant à l'utilisateur connecté
+    purchases.value = orders
+      .filter(o => o.status === 'paid' && o.email?.toLowerCase() === auth.user?.email?.toLowerCase())
+      .map(o => ({
+        id: o.id,
+        order_id: o.id,
+        title: o.items?.map(i => i.product_title).join(', ') || `Commande #${o.id}`,
+        date: new Date(o.created_at || Date.now()).toLocaleDateString('fr-FR'),
+        licenseKey: `YASS-${String(o.id).padStart(6, '0')}-VIP`,
+        items: o.items || [],
+        total: o.total_amount
+      }));
+  } catch (e) {
+    console.error('Erreur chargement commandes:', e);
+  } finally {
+    loadingPurchases.value = false;
   }
-]);
+};
 
 const referralLink = computed(() => {
   const code = profile.value.name ? profile.value.name.replace(/\s+/g, '').toUpperCase().substring(0, 8) : 'CLIENT';
@@ -479,14 +488,19 @@ const revokeSession = () => {
 
 const updateProfile = async () => {
   try {
-    toastStore.showToast('Informations personnelles enregistrées avec succès !', 'success');
+    const res = await api.put('/user/profile', {
+      name: profile.value.name,
+      phone: profile.value.phone,
+      company: profile.value.company,
+      address: profile.value.address,
+    });
     if (auth.user) {
-      auth.user.name = profile.value.name;
-      auth.user.email = profile.value.email;
+      Object.assign(auth.user, res.data?.user || res.data);
       localStorage.setItem('user', JSON.stringify(auth.user));
     }
+    toastStore.showToast('Profil mis à jour avec succès !', 'success');
   } catch (error) {
-    toastStore.showToast('Erreur lors de la mise à jour du profil.', 'error');
+    toastStore.showToast(error.response?.data?.message || 'Erreur lors de la mise à jour du profil.', 'error');
   }
 };
 
@@ -499,76 +513,51 @@ const updatePassword = async () => {
     toastStore.showToast('Les mots de passe ne correspondent pas.', 'error');
     return;
   }
-
-  toastStore.showToast('Mot de passe mis à jour avec succès !', 'success');
-  profile.value.newPassword = '';
-  profile.value.confirmPassword = '';
+  try {
+    await api.put('/user/profile', {
+      password: profile.value.newPassword,
+      password_confirmation: profile.value.confirmPassword,
+    });
+    toastStore.showToast('Mot de passe mis à jour avec succès !', 'success');
+    profile.value.newPassword = '';
+    profile.value.confirmPassword = '';
+  } catch (error) {
+    toastStore.showToast(error.response?.data?.message || 'Erreur changement mot de passe.', 'error');
+  }
 };
 
 const downloadFile = (purchase) => {
   toastStore.showToast(`Téléchargement de ${purchase.title} démarré...`, 'info');
-  const a = document.createElement('a');
-  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(`Téléchargement Officiel Yass Digital Lab\nProduit: ${purchase.title}\nClé: ${purchase.licenseKey}\nMerci pour votre achat !`);
-  a.download = `${purchase.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_yassdigitallab.txt`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  // Ouvrir le fichier numérique si une URL est disponible
+  if (purchase.downloadUrl) {
+    window.open(purchase.downloadUrl, '_blank');
+  } else {
+    toastStore.showToast('Accès au fichier en cours de traitement.', 'info');
+  }
 };
 
-const downloadInvoice = (orderId) => {
-  const invoiceHTML = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Facture #FA-00000${orderId}</title>
-  <style>
-    body { font-family: 'Helvetica', sans-serif; padding: 40px; color: #0f172a; }
-    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #d4af37; padding-bottom: 20px; }
-    .title { font-size: 24px; font-weight: bold; color: #0f172a; }
-    .table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-    .table th, .table td { padding: 12px; border: 1px solid #e2e8f0; text-align: left; }
-    .table th { background: #f8fafc; }
-    .total { text-align: right; margin-top: 20px; font-size: 18px; font-weight: bold; color: #d4af37; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div>
-      <div class="title">Yass Digital Lab</div>
-      <p>Outils Numériques Intelligents</p>
-    </div>
-    <div>
-      <h3>FACTURE #FA-00000${orderId}</h3>
-      <p>Date: ${new Date().toLocaleDateString('fr-FR')}</p>
-    </div>
-  </div>
-  <div style="margin-top: 30px;">
-    <p><strong>Client:</strong> ${profile.value.name || 'Client'}</p>
-    <p><strong>Email:</strong> ${profile.value.email || 'client@yass.com'}</p>
-  </div>
-  <table class="table">
-    <thead>
-      <tr><th>Description</th><th>Qté</th><th>Prix unitaire</th><th>Total</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Achat numérique Yass Digital Lab (Licence VIP)</td><td>1</td><td>49.00 €</td><td>49.00 €</td></tr>
-    </tbody>
-  </table>
-  <div class="total">Total Payé: 49.00 €</div>
-</body>
-</html>`;
-
-  const blob = new Blob([invoiceHTML], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Facture_FA-00000${orderId}_YassDigitalLab.html`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toastStore.showToast(`Facture #FA-00000${orderId} téléchargée avec succès !`, 'success');
+const downloadInvoice = async (orderId) => {
+  try {
+    const response = await api.get(`/orders/${orderId}/invoice`, {
+      responseType: 'blob',
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `facture-${String(orderId).padStart(6, '0')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toastStore.showToast(`Facture #FA-${String(orderId).padStart(6, '0')} téléchargée !`, 'success');
+  } catch (error) {
+    toastStore.showToast('Erreur lors du téléchargement de la facture.', 'error');
+    console.error('Facture download error:', error);
+  }
 };
+
+
 
 const copyReferralLink = async () => {
   try {
@@ -593,6 +582,7 @@ onMounted(() => {
     profile.value.address = auth.user.address || '';
     profile.value.avatar = auth.user.avatar || '';
   }
+  loadPurchases();
 });
 </script>
 

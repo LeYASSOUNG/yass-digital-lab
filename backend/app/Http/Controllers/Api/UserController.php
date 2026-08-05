@@ -25,6 +25,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -127,12 +128,24 @@ class UserController extends Controller
 
         // Validation avec 'sometimes' = champs optionnels (mise à jour partielle possible)
         $validated = $request->validate([
-            'name'    => 'sometimes|string|max:255',
-            'phone'   => 'nullable|string|max:50',
-            'company' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:500',
-            'avatar'  => 'nullable|string',              // URL de l'avatar (image ou URL externe)
+            'name'                  => 'sometimes|string|max:255',
+            'phone'                 => 'nullable|string|max:50',
+            'company'               => 'nullable|string|max:255',
+            'address'               => 'nullable|string|max:500',
+            'avatar'                => 'nullable|string',
+            'password'              => 'sometimes|string|min:8|confirmed',
+            'password_confirmation' => 'sometimes|string',
         ]);
+
+        // Si un nouveau mot de passe est fourni, le hacher avant mise à jour
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password'], $validated['password_confirmation']);
+        }
+
+        // Suppression du champ confirmation (non stocké en base)
+        unset($validated['password_confirmation']);
 
         // Mise à jour uniquement des champs fournis
         $user->update($validated);

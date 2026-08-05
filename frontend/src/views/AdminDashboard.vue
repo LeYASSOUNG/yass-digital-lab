@@ -186,7 +186,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in filteredOrders.slice(0, 8)" :key="order.id" style="border-bottom: 1px solid var(--color-border);">
+              <tr v-for="order in paginatedOrders" :key="order.id" style="border-bottom: 1px solid var(--color-border);">
                 <td style="padding: 12px; font-weight: 700; color: var(--color-text-light);">#{{ order.id }}</td>
                 <td style="padding: 12px; font-weight: 600;">{{ order.email }}</td>
                 <td style="padding: 12px; color: var(--color-accent); font-weight: 800;">{{ order.total_amount }} €</td>
@@ -198,13 +198,26 @@
                   </span>
                 </td>
                 <td style="padding: 12px;">
-                  <a :href="`/api/orders/${order.id}/invoice`" target="_blank" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
+                  <button @click="downloadAdminInvoice(order.id)" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
                     <Download :size="12" /> PDF
-                  </a>
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
+
+          <!-- Navigation Pagination Commandes -->
+          <div class="flex justify-between items-center mt-4 pt-3" style="border-top: 1px solid var(--color-border); font-size: 0.85rem;">
+            <span style="color: var(--color-text-light);">Page {{ orderPage }} sur {{ totalOrderPages }} ({{ filteredOrders.length }} commandes)</span>
+            <div class="flex gap-2">
+              <button @click="orderPage = Math.max(1, orderPage - 1)" :disabled="orderPage === 1" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">
+                ← Précédent
+              </button>
+              <button @click="orderPage = Math.min(totalOrderPages, orderPage + 1)" :disabled="orderPage === totalOrderPages" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">
+                Suivant →
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -370,7 +383,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="product in filteredProducts" :key="product.id" style="border-bottom: 1px solid var(--color-border);">
+              <tr v-for="product in paginatedProducts" :key="product.id" style="border-bottom: 1px solid var(--color-border);">
                 <td style="padding: 12px; color: var(--color-text-light);">#{{ product.id }}</td>
                 <td style="padding: 12px; font-weight: 600;">{{ product.title }}</td>
                 <td style="padding: 12px;"><span style="background: rgba(212,175,55,0.15); color: var(--color-accent); padding: 2px 9px; border-radius: 999px; font-size: 0.78rem; font-weight: 700;">{{ product.type }}</span></td>
@@ -386,6 +399,19 @@
               </tr>
             </tbody>
           </table>
+
+          <!-- Navigation Pagination Produits -->
+          <div class="flex justify-between items-center mt-4 pt-3" style="border-top: 1px solid var(--color-border); font-size: 0.85rem;">
+            <span style="color: var(--color-text-light);">Page {{ productPage }} sur {{ totalProductPages }} ({{ filteredProducts.length }} produits)</span>
+            <div class="flex gap-2">
+              <button @click="productPage = Math.max(1, productPage - 1)" :disabled="productPage === 1" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">
+                ← Précédent
+              </button>
+              <button @click="productPage = Math.min(totalProductPages, productPage + 1)" :disabled="productPage === totalProductPages" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">
+                Suivant →
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -856,6 +882,27 @@ const filteredPosts = computed(() => {
   return posts.value.filter(p => p.title?.toLowerCase().includes(q));
 });
 
+// Pagination UI pour les commandes et les produits
+const orderPage = ref(1);
+const orderPerPage = 5;
+
+const productPage = ref(1);
+const productPerPage = 5;
+
+const paginatedOrders = computed(() => {
+  const start = (orderPage.value - 1) * orderPerPage;
+  return filteredOrders.value.slice(start, start + orderPerPage);
+});
+
+const totalOrderPages = computed(() => Math.ceil(filteredOrders.value.length / orderPerPage) || 1);
+
+const paginatedProducts = computed(() => {
+  const start = (productPage.value - 1) * productPerPage;
+  return filteredProducts.value.slice(start, start + productPerPage);
+});
+
+const totalProductPages = computed(() => Math.ceil(filteredProducts.value.length / productPerPage) || 1);
+
 const editingProduct = ref(null);
 const editingPost = ref(null);
 const editingCoupon = ref(null);
@@ -1159,6 +1206,27 @@ const generatePDFReport = () => {
   a.remove();
   URL.revokeObjectURL(url);
   toastStore.showToast('Rapport financier généré !', 'success');
+};
+
+const downloadAdminInvoice = async (orderId) => {
+  try {
+    const response = await api.get(`/orders/${orderId}/invoice`, {
+      responseType: 'blob',
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `facture-admin-${String(orderId).padStart(6, '0')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toastStore.showToast(`Facture #${String(orderId).padStart(6, '0')} téléchargée !`, 'success');
+  } catch (error) {
+    toastStore.showToast('Erreur lors du téléchargement de la facture.', 'error');
+    console.error('Admin invoice error:', error);
+  }
 };
 </script>
 
