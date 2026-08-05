@@ -825,6 +825,12 @@ const visibleTabs = computed(() => {
   ];
 });
 
+const extractArray = (data) => {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.data)) return data.data;
+  return [];
+};
+
 const products = ref([]);
 const orders = ref([]);
 const posts = ref([]);
@@ -836,50 +842,56 @@ const reviewsList = ref([]);
 
 const tabCounts = computed(() => ({
   overview: null,
-  users: usersList.value.length,
-  products: products.value.length,
-  quotes: quoteRequests.value.length,
-  reviews: reviewsList.value.length,
-  blog: posts.value.length,
-  coupons: coupons.value.length,
-  newsletter: subscribers.value.length,
+  users: (Array.isArray(usersList.value) ? usersList.value : []).length,
+  products: (Array.isArray(products.value) ? products.value : []).length,
+  quotes: (Array.isArray(quoteRequests.value) ? quoteRequests.value : []).length,
+  reviews: (Array.isArray(reviewsList.value) ? reviewsList.value : []).length,
+  blog: (Array.isArray(posts.value) ? posts.value : []).length,
+  coupons: (Array.isArray(coupons.value) ? coupons.value : []).length,
+  newsletter: (Array.isArray(subscribers.value) ? subscribers.value : []).length,
 }));
 
 // Données filtrées selon la recherche
 const filteredProducts = computed(() => {
-  if (!searchProductQuery.value.trim()) return products.value;
+  const list = Array.isArray(products.value) ? products.value : [];
+  if (!searchProductQuery.value.trim()) return list;
   const q = searchProductQuery.value.toLowerCase();
-  return products.value.filter(p => p.title?.toLowerCase().includes(q) || p.type?.toLowerCase().includes(q));
+  return list.filter(p => p.title?.toLowerCase().includes(q) || p.type?.toLowerCase().includes(q));
 });
 
 const filteredUsers = computed(() => {
-  if (!searchUserQuery.value.trim()) return usersList.value;
+  const list = Array.isArray(usersList.value) ? usersList.value : [];
+  if (!searchUserQuery.value.trim()) return list;
   const q = searchUserQuery.value.toLowerCase();
-  return usersList.value.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.role?.toLowerCase().includes(q));
+  return list.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.role?.toLowerCase().includes(q));
 });
 
 const filteredOrders = computed(() => {
-  if (!searchOrderQuery.value.trim()) return orders.value;
+  const list = Array.isArray(orders.value) ? orders.value : [];
+  if (!searchOrderQuery.value.trim()) return list;
   const q = searchOrderQuery.value.toLowerCase();
-  return orders.value.filter(o => String(o.id).includes(q) || o.email?.toLowerCase().includes(q) || o.status?.toLowerCase().includes(q));
+  return list.filter(o => String(o.id).includes(q) || o.email?.toLowerCase().includes(q) || o.status?.toLowerCase().includes(q));
 });
 
 const filteredQuoteRequests = computed(() => {
-  if (!searchQuoteQuery.value.trim()) return quoteRequests.value;
+  const list = Array.isArray(quoteRequests.value) ? quoteRequests.value : [];
+  if (!searchQuoteQuery.value.trim()) return list;
   const q = searchQuoteQuery.value.toLowerCase();
-  return quoteRequests.value.filter(r => r.name?.toLowerCase().includes(q) || r.email?.toLowerCase().includes(q) || r.service_title?.toLowerCase().includes(q));
+  return list.filter(r => r.name?.toLowerCase().includes(q) || r.email?.toLowerCase().includes(q) || r.service_title?.toLowerCase().includes(q));
 });
 
 const filteredReviews = computed(() => {
-  if (!searchReviewQuery.value.trim()) return reviewsList.value;
+  const list = Array.isArray(reviewsList.value) ? reviewsList.value : [];
+  if (!searchReviewQuery.value.trim()) return list;
   const q = searchReviewQuery.value.toLowerCase();
-  return reviewsList.value.filter(r => r.name?.toLowerCase().includes(q) || r.comment?.toLowerCase().includes(q));
+  return list.filter(r => r.name?.toLowerCase().includes(q) || r.comment?.toLowerCase().includes(q));
 });
 
 const filteredPosts = computed(() => {
-  if (!searchBlogQuery.value.trim()) return posts.value;
+  const list = Array.isArray(posts.value) ? posts.value : [];
+  if (!searchBlogQuery.value.trim()) return list;
   const q = searchBlogQuery.value.toLowerCase();
-  return posts.value.filter(p => p.title?.toLowerCase().includes(q));
+  return list.filter(p => p.title?.toLowerCase().includes(q));
 });
 
 // Pagination UI pour les commandes et les produits
@@ -915,7 +927,10 @@ const newProduct = ref({ title: '', price: '', type: 'Pack', description: '', ca
 const newPost = ref({ title: '', content: '', is_published: true });
 const newCoupon = ref({ code: '', discount_amount: '', discount_percentage: '', expires_at: '' });
 
-const totalRevenue = computed(() => orders.value.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0));
+const totalRevenue = computed(() => {
+  const list = Array.isArray(orders.value) ? orders.value : [];
+  return list.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+});
 
 onMounted(async () => {
   const allowedRoles = ['admin', 'super_admin', 'creator', 'editor', 'support'];
@@ -939,49 +954,49 @@ onMounted(async () => {
 const loadProducts = async () => {
   try {
     const res = await api.get('/products');
-    products.value = res.data;
+    products.value = extractArray(res.data);
   } catch(e) { products.value = []; }
 };
 const loadOrders = async () => {
   try {
     const res = await api.get('/orders');
-    orders.value = res.data;
+    orders.value = extractArray(res.data);
   } catch(e) { orders.value = []; }
 };
 const loadPosts = async () => {
   try {
     const res = await api.get('/posts');
-    posts.value = res.data;
+    posts.value = extractArray(res.data);
   } catch(e) { posts.value = []; }
 };
 const loadSubscribers = async () => {
   try {
     const res = await api.get('/newsletter');
-    subscribers.value = res.data;
+    subscribers.value = extractArray(res.data);
   } catch(e) { subscribers.value = []; }
 };
 const loadCoupons = async () => {
   try {
     const res = await api.get('/coupons');
-    coupons.value = res.data;
+    coupons.value = extractArray(res.data);
   } catch(e) { coupons.value = []; }
 };
 const loadUsers = async () => {
   try {
     const res = await api.get('/users');
-    usersList.value = res.data;
+    usersList.value = extractArray(res.data);
   } catch(e) { usersList.value = []; }
 };
 const loadReviews = async () => {
   try {
     const res = await api.get('/reviews');
-    reviewsList.value = res.data;
+    reviewsList.value = extractArray(res.data);
   } catch(e) { reviewsList.value = []; }
 };
 const loadQuoteRequests = async () => {
   try {
     const res = await api.get('/quote-requests');
-    quoteRequests.value = res.data;
+    quoteRequests.value = extractArray(res.data);
   } catch(e) { quoteRequests.value = []; }
 };
 

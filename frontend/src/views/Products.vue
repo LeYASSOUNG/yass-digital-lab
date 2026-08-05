@@ -194,7 +194,7 @@ const quickAddToCart = (product) => {
 onMounted(async () => {
   try {
     const res = await api.get('/products');
-    products.value = res.data;
+    products.value = Array.isArray(res.data) ? res.data : (res.data?.data || []);
   } catch (e) {
     console.error('Erreur produits:', e);
   } finally {

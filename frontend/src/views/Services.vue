@@ -89,6 +89,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useToastStore } from '../stores/toast';
+import api from '../api';
 import axios from 'axios';
 import { 
   Briefcase, 
@@ -112,7 +113,7 @@ const quoteForm = ref({ name: '', email: '', details: '' });
 onMounted(async () => {
   try {
     const response = await api.get('/services');
-    services.value = response.data;
+    services.value = Array.isArray(response.data) ? response.data : (response.data?.data || []);
   } catch (error) {
     console.error("Erreur lors de la récupération des services:", error);
   } finally {
