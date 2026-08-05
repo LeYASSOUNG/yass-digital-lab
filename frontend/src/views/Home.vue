@@ -340,8 +340,10 @@ onMounted(async () => {
       api.get('/products'),
       api.get('/services')
     ]);
-    featuredProducts.value = productsRes.data.slice(0, 3);
-    services.value = servicesRes.data.slice(0, 4);
+    const prodList = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || []);
+    const servList = Array.isArray(servicesRes.data) ? servicesRes.data : (servicesRes.data?.data || []);
+    featuredProducts.value = prodList.slice(0, 3);
+    services.value = servList.slice(0, 4);
   } catch (e) {
     console.error(e);
   } finally {

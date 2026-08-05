@@ -82,7 +82,7 @@ const getImageUrl = (imagePath) => {
 onMounted(async () => {
   try {
     const res = await api.get('/posts');
-    posts.value = res.data;
+    posts.value = Array.isArray(res.data) ? res.data : (res.data?.data || []);
   } catch (e) {
     console.error(e);
   } finally {

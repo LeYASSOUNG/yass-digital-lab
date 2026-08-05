@@ -181,7 +181,8 @@ const loadProduct = async (id) => {
     }
     
     const allRes = await api.get('/products');
-    relatedProducts.value = allRes.data.filter(p => p.id != id).slice(0, 3);
+    const allList = Array.isArray(allRes.data) ? allRes.data : (allRes.data?.data || []);
+    relatedProducts.value = allList.filter(p => p.id != id).slice(0, 3);
   } catch (error) {
     console.error("Erreur lors de la récupération du produit:", error);
   } finally {
