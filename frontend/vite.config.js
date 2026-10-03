@@ -42,6 +42,7 @@ export default defineConfig({
     }
   },
   build: {
+    minify: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -57,5 +58,8 @@ export default defineConfig({
         }
       }
     }
+  },
+  optimizeDeps: {
+    include: ['lucide-vue-next', '@lucide/vue', 'vue', 'pinia', 'vue-router']
   }
 })
