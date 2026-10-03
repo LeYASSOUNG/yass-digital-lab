@@ -1,49 +1,50 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Home              from '../views/Home.vue'
-import Products          from '../views/Products.vue'
-import ProductDetail     from '../views/ProductDetail.vue'
-import Services          from '../views/Services.vue'
-import About             from '../views/About.vue'
-import Checkout          from '../views/Checkout.vue'
-import Login             from '../views/Login.vue'
-import AdminDashboard    from '../views/AdminDashboard.vue'
-import ClientDashboard   from '../views/ClientDashboard.vue'
-import Blog              from '../views/Blog.vue'
-import Contact           from '../views/Contact.vue'
-import Notifications     from '../views/Notifications.vue'
-import OrderConfirmation from '../views/OrderConfirmation.vue'
-import ForgotPassword    from '../views/ForgotPassword.vue'
-import ResetPassword     from '../views/ResetPassword.vue'
-import VerifyEmail       from '../views/VerifyEmail.vue'
-import NotFound          from '../views/NotFound.vue'
-
 const routes = [
-  { path: '/',                    name: 'Home',              component: Home },
-  { path: '/products',            name: 'Products',           component: Products },
-  { path: '/products/:id',        name: 'ProductDetail',      component: ProductDetail },
-  { path: '/services',            name: 'Services',           component: Services },
-  { path: '/about',               name: 'About',              component: About },
-  { path: '/checkout',            name: 'Checkout',           component: Checkout },
-  { path: '/login',               name: 'Login',              component: Login },
-  { path: '/blog',                name: 'Blog',               component: Blog },
-  { path: '/contact',             name: 'Contact',            component: Contact },
-  { path: '/order-confirmation',  name: 'OrderConfirmation',  component: OrderConfirmation },
-  { path: '/forgot-password',     name: 'ForgotPassword',     component: ForgotPassword },
-  { path: '/reset-password',      name: 'ResetPassword',      component: ResetPassword },
-  { path: '/verify-email',        name: 'VerifyEmail',        component: VerifyEmail },
+  { path: '/',                    name: 'Home',              component: () => import('../views/Home.vue') },
+  { path: '/products',            name: 'Products',           component: () => import('../views/Products.vue') },
+  { path: '/products/:id',        name: 'ProductDetail',      component: () => import('../views/ProductDetail.vue') },
+  { path: '/services',            name: 'Services',           component: () => import('../views/Services.vue') },
+  { path: '/courses',             name: 'Courses',            component: () => import('../views/Courses.vue') },
+  { path: '/courses/:id',         name: 'CourseDetail',       component: () => import('../views/CourseDetail.vue') },
+  { path: '/coupons',             name: 'Coupons',            component: () => import('../views/Coupons.vue') },
+  { path: '/about',               name: 'About',              component: () => import('../views/About.vue') },
+  { path: '/checkout',            name: 'Checkout',           component: () => import('../views/Checkout.vue') },
+  { path: '/login',               name: 'Login',              component: () => import('../views/Login.vue') },
+  { path: '/blog',                name: 'Blog',               component: () => import('../views/Blog.vue') },
+  { path: '/contact',             name: 'Contact',            component: () => import('../views/Contact.vue') },
+  { path: '/order-confirmation',  name: 'OrderConfirmation',  component: () => import('../views/OrderConfirmation.vue') },
+  { path: '/forgot-password',     name: 'ForgotPassword',     component: () => import('../views/ForgotPassword.vue') },
+  { path: '/verify-email/:id/:hash', name: 'VerifyEmail', component: () => import('../views/VerifyEmail.vue') },
+  { path: '/suivi-devis',         name: 'QuoteTracking',      component: () => import('../views/QuoteTracking.vue') },
+  { path: '/auth/callback',       name: 'AuthCallback',       component: () => import('../views/AuthCallback.vue') },
 
   // Routes protégées — nécessitent une session active
   {
+    path: '/admin/login',
+    name: 'AdminLogin',
+    component: () => import('../views/AdminLogin.vue')
+  },
+  {
     path: '/admin',
     name: 'AdminDashboard',
-    component: AdminDashboard,
+    component: () => import('../views/AdminDashboard.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
-  { path: '/dashboard',     name: 'ClientDashboard', component: ClientDashboard, meta: { requiresAuth: true } },
-  { path: '/notifications', name: 'Notifications',   component: Notifications,   meta: { requiresAuth: true } },
+  { 
+    path: '/dashboard',     
+    name: 'ClientDashboard', 
+    component: () => import('../views/ClientDashboard.vue'), 
+    meta: { requiresAuth: true } 
+  },
+  { 
+    path: '/notifications', 
+    name: 'Notifications',   
+    component: () => import('../views/Notifications.vue'),   
+    meta: { requiresAuth: true } 
+  },
 
-  { path: '/:pathMatch(.*)*',     name: 'NotFound',           component: NotFound }
+  { path: '/:pathMatch(.*)*',     name: 'NotFound',           component: () => import('../views/NotFound.vue') }
 ]
 
 const router = createRouter({
@@ -54,27 +55,27 @@ const router = createRouter({
   }
 })
 
-// ─── Navigation Guards ────────────────────────────────────────────────────────
-router.beforeEach((to, _from, next) => {
-  // Lecture du token et de l'utilisateur depuis localStorage
+// Navigation Guards Vue Router (sans callback next deprecie)
+router.beforeEach((to) => {
   const token = localStorage.getItem('token');
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
 
-  if (to.meta.requiresAuth && !token) {
-    // Non connecté → rediriger vers /login
-    return next({ name: 'Login', query: { redirect: to.fullPath } });
-  }
-
   if (to.meta.requiresAdmin) {
     const adminRoles = ['admin', 'super_admin', 'editor', 'creator', 'support'];
+    if (!token) {
+      return { name: 'AdminLogin', query: { redirect: to.fullPath } };
+    }
     if (!user || !adminRoles.includes(user.role)) {
-      // Connecté mais pas admin → rediriger vers le dashboard client
-      return next({ name: 'ClientDashboard' });
+      // Si c'est un client qui essaie d'aller sur l'admin
+      return { name: 'ClientDashboard' };
     }
   }
 
-  next();
+  if (to.meta.requiresAuth && !token) {
+    return { name: 'Login', query: { redirect: to.fullPath } };
+  }
 });
 
 export default router
+

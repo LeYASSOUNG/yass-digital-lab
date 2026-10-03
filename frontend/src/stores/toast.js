@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+﻿import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const useToastStore = defineStore('toast', () => {
@@ -19,3 +19,4 @@ export const useToastStore = defineStore('toast', () => {
 
   return { toasts, showToast, removeToast };
 });
+

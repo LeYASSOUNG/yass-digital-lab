@@ -154,7 +154,7 @@ class DatabaseSeeder extends Seeder
                 'slug'        => 'mega-pack-500-prompts-chatgpt-claude-pro',
                 'description' => 'Un pack complet de 500+ prompts optimisés pour la rédaction SEO, '
                     . 'le code source, le marketing d\'acquisition et la productivité.',
-                'price' => 19.99,
+                'price' => 13000,
                 'type'  => 'Pack',
             ],
             [
@@ -163,7 +163,7 @@ class DatabaseSeeder extends Seeder
                 'slug'        => 'template-saas-starter-vue-3-laravel-12',
                 'description' => 'Starter kit prêt pour la production avec authentification Sanctum, '
                     . 'gestion des rôles (RBAC), paiement Stripe et design soigné.',
-                'price' => 49.99,
+                'price' => 32500,
                 'type'  => 'Template',
             ],
             [
@@ -172,7 +172,7 @@ class DatabaseSeeder extends Seeder
                 'slug'        => 'kit-automation-n8n-make-agences',
                 'description' => 'Ensemble de workflows automatisés prêt-à-importer pour synchroniser '
                     . 'Stripe, vos réseaux sociaux, vos emails et Notion.',
-                'price' => 39.99,
+                'price' => 26000,
                 'type'  => 'Outil',
             ],
             [
@@ -181,7 +181,7 @@ class DatabaseSeeder extends Seeder
                 'slug'        => 'guide-ultime-agent-ia-python',
                 'description' => 'E-book pas-à-pas avec code fourni pour concevoir et déployer un agent IA '
                     . 'autonome capable d\'analyser vos documents PDF.',
-                'price' => 14.99,
+                'price' => 10000,
                 'type'  => 'E-book',
             ],
             [
@@ -190,7 +190,7 @@ class DatabaseSeeder extends Seeder
                 'slug'        => 'dashboard-admin-ui-kit-vue-tailwind',
                 'description' => 'Kit de composants d\'interface moderne comprenant graphiques analytiques, '
                     . 'formulaires réactifs et thèmes clair/sombre.',
-                'price' => 29.99,
+                'price' => 19500,
                 'type'  => 'Template',
             ],
             [
@@ -199,7 +199,7 @@ class DatabaseSeeder extends Seeder
                 'slug'        => 'pack-prompts-midjourney-dalle3-designers',
                 'description' => 'Plus de 200 prompts haute précision pour générer des maquettes UI, '
                     . 'logos vectoriels et visuels photoréalistes.',
-                'price' => 12.99,
+                'price' => 8500,
                 'type'  => 'Pack',
             ],
         ];
@@ -218,28 +218,28 @@ class DatabaseSeeder extends Seeder
                 'slug'           => 'creation-de-site-web-sur-mesure',
                 'description'    => 'Conception de sites vitrines et e-commerce modernes, haute performance, '
                     . 'optimisés SEO avec intégration de paiement en ligne.',
-                'starting_price' => 299.00,
+                'starting_price' => 196000,
             ],
             [
                 'title'          => 'Développement d\'application SaaS & API Laravel / Vue.js',
                 'slug'           => 'developpement-application-saas-laravel-vue',
                 'description'    => 'Conception de plateformes web sur mesure avec architecture API RESTful, '
                     . 'tableau de bord client, facturation automatisée.',
-                'starting_price' => 899.00,
+                'starting_price' => 589000,
             ],
             [
                 'title'          => 'Intégration d\'Agents IA & Automatisation de Workflows',
                 'slug'           => 'integration-agents-ia-automatisation',
                 'description'    => 'Développement et intégration d\'agents IA personnalisés (OpenAI/Claude) '
                     . 'connectés à vos outils métiers pour automatiser.',
-                'starting_price' => 499.00,
+                'starting_price' => 327000,
             ],
             [
                 'title'          => 'Audit de Performance, SEO & Sécurité Web',
                 'slug'           => 'audit-performance-seo-securite-web',
                 'description'    => 'Analyse approfondie de votre code, temps de chargement (Core Web Vitals), '
                     . 'failles de sécurité et recommandations.',
-                'starting_price' => 199.00,
+                'starting_price' => 130500,
             ],
         ];
 
@@ -341,26 +341,26 @@ class DatabaseSeeder extends Seeder
 
         $orders = [
             [
-                'order' => ['email' => 'client@yassdigital.lab', 'total_amount' => 19.99, 'status' => 'paid'],
+                'order' => ['email' => 'client@yassdigital.lab', 'total_amount' => 13000, 'status' => 'paid'],
                 'item'  => [
                     'product_title' => 'Mega Pack 500+ Prompts ChatGPT & Claude Pro',
-                    'price'         => 19.99,
+                    'price' => 13000,
                     'quantity'      => 1,
                 ],
             ],
             [
-                'order' => ['email' => 'client@yassdigital.lab', 'total_amount' => 49.99, 'status' => 'paid'],
+                'order' => ['email' => 'client@yassdigital.lab', 'total_amount' => 32500, 'status' => 'paid'],
                 'item'  => [
                     'product_title' => 'Template SaaS Starter Vue 3 + Laravel 12 Glassmorphism',
-                    'price'         => 49.99,
+                    'price' => 32500,
                     'quantity'      => 1,
                 ],
             ],
             [
-                'order' => ['email' => 'sophie.martin@martin-digital.fr', 'total_amount' => 39.99, 'status' => 'paid'],
+                'order' => ['email' => 'sophie.martin@martin-digital.fr', 'total_amount' => 26000, 'status' => 'paid'],
                 'item'  => [
                     'product_title' => 'Kit d\'Automation N8N & Make pour Agences Tech',
-                    'price'         => 39.99,
+                    'price' => 26000,
                     'quantity'      => 1,
                 ],
             ],
@@ -387,8 +387,8 @@ class DatabaseSeeder extends Seeder
         }
 
         if (Coupon::count() === 0) {
-            Coupon::create(['code' => 'YASS20',  'discount_amount' => 5.00,  'discount_percentage' => 20]);
-            Coupon::create(['code' => 'PROMO10', 'discount_amount' => 10.00, 'discount_percentage' => 10]);
+            Coupon::create(['code' => 'YASS20',  'discount_amount' => 3500,  'discount_percentage' => 20]);
+            Coupon::create(['code' => 'PROMO10', 'discount_amount' => 6500, 'discount_percentage' => 10]);
         }
     }
 

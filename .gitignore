@@ -26,3 +26,8 @@ Thumbs.db
 .idea/
 *.suo
 *.user
+
+# Docker — fichiers sensibles (ne pas committer les vraies valeurs)
+.env
+# Committer .env.example à la place (template sans valeurs sensibles)
+# docker-compose.override.yml est intentionnellement ignoré en production

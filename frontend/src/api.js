@@ -21,18 +21,22 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Intercepteur pour gérer les erreurs d'authentification (401 Unauthorized)
+// Intercepteur pour gérer les erreurs d'authentification (401) et d'autorisation (403)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === HTTP_STATUS_UNAUTHORIZED) {
+    if (error.response) {
+      const status = error.response.status;
       const path = window.location.pathname;
       const isProtectedRoute = path.startsWith('/admin') || path.startsWith('/dashboard');
-      // On ne nettoie les jetons que si l'utilisateur est sur une page protégée
-      if (isProtectedRoute) {
+
+      if (status === HTTP_STATUS_UNAUTHORIZED && isProtectedRoute) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';
+      } else if (status === 403 && path.startsWith('/admin')) {
+        // Redirige les utilisateurs non autorisés vers le dashboard client
+        window.location.href = '/dashboard';
       }
     }
     return Promise.reject(error);
@@ -40,3 +44,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

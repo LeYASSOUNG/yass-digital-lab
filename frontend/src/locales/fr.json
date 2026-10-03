@@ -1,0 +1,16 @@
+{
+  "home": "Accueil",
+  "products": "Produits",
+  "services": "Services",
+  "dashboard": "Mon Espace",
+  "login": "Connexion",
+  "blog": "Blog",
+  "about": "À propos",
+  "contact": "Contact",
+  "promoNotice": "Promo -20% avec le code YASS20",
+  "newsletterTitle": "Abonnez-vous à notre Newsletter",
+  "newsletterSub": "Recevez nos dernières offres et actualités.",
+  "footerRights": "© 2026 Yass Digital Lab. Tous droits réservés.",
+  "mySpace": "Mon Espace Client",
+  "logout": "Déconnexion"
+}

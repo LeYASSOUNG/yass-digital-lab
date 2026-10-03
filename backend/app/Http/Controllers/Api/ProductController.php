@@ -129,6 +129,7 @@ class ProductController extends Controller
         }
 
         $product->update($validated);
+        \Illuminate\Support\Facades\Cache::flush();
         return response()->json($product);
     }
 
@@ -139,6 +140,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->delete();
+        \Illuminate\Support\Facades\Cache::flush();
         return response()->json(['message' => 'Produit supprimé avec succès']);
     }
 
@@ -157,5 +159,55 @@ class ProductController extends Controller
 
         $review = \App\Models\Review::create($validated);
         return response()->json(['message' => 'Avis ajouté avec succès !', 'review' => $review], 201);
+    }
+
+    /**
+     * Génère un lien de téléchargement signé pour un utilisateur ayant acheté le produit.
+     * Accessible uniquement via auth:sanctum
+     */
+    public function getDownloadLink(Request $request, int $id)
+    {
+        $user = $request->user();
+
+        // 1. Vérifier l'achat
+        $hasPurchased = \App\Models\Order::where('email', $user->email)
+            ->where('status', 'paid')
+            ->whereHas('items', function ($q) use ($id) {
+                $q->where('product_id', $id);
+            })
+            ->exists();
+
+        // 2. Autoriser l'accès aux Admins et aux acheteurs
+        if (!$hasPurchased && !$user->isAdmin()) {
+            return response()->json(['message' => 'Vous n\'avez pas accès à ce produit.'], 403);
+        }
+
+        // 3. Générer l'URL signée temporaire (valide 1 heure) anti-IDOR
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'products.download',
+            now()->addHours(1),
+            ['id' => $id]
+        );
+
+        return response()->json(['download_url' => $url]);
+    }
+
+    /**
+     * Télécharge le fichier sécurisé (Vérification de signature URL).
+     * Route publique mais impossible à forcer sans signature.
+     */
+    public function downloadSecureFile(Request $request, int $id)
+    {
+        if (!$request->hasValidSignature()) {
+            abort(403, 'Lien de téléchargement expiré ou invalide.');
+        }
+
+        $product = Product::findOrFail($id);
+
+        if (!$product->download_url || !\Illuminate\Support\Facades\Storage::disk('local')->exists($product->download_url)) {
+            abort(404, 'Fichier source introuvable sur le serveur.');
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($product->download_url, \Illuminate\Support\Str::slug($product->title) . '.zip');
     }
 }

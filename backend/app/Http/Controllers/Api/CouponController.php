@@ -58,7 +58,7 @@ class CouponController extends Controller
 
         // Retourne les détails de la réduction (montant fixe OU pourcentage)
         return response()->json([
-            'discount_amount'     => $coupon->discount_amount,      // Réduction en euros (ex: -5€)
+            'discount_amount'     => $coupon->discount_amount,      // Réduction en FCFA (ex: -500 FCFA)
             'discount_percentage' => $coupon->discount_percentage,  // Réduction en % (ex: -10%)
             'message'             => 'Code promo appliqué avec succès'
         ]);
@@ -72,6 +72,20 @@ class CouponController extends Controller
     public function index()
     {
         return response()->json(Coupon::all());
+    }
+
+    /**
+     * Liste les coupons valides et non expirés (Public).
+     *
+     * @return \Illuminate\Http\JsonResponse  Tableau de coupons actifs
+     */
+    public function publicIndex()
+    {
+        $activeCoupons = Coupon::whereNull('expires_at')
+            ->orWhere('expires_at', '>', Carbon::now())
+            ->get();
+            
+        return response()->json($activeCoupons);
     }
 
     /**

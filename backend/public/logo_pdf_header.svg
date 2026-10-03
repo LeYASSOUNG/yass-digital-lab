@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGradPdf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE699"/>
+      <stop offset="50%" stop-color="#F5C027"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- YDL Digital Pixel Emblem -->
+  <g transform="translate(10, 10) scale(0.65)">
+    <!-- Pixels above Y -->
+    <rect x="25" y="25" width="22" height="22" fill="url(#goldGradPdf)"/>
+    <rect x="58" y="25" width="22" height="22" fill="url(#goldGradPdf)"/>
+    <rect x="58" y="58" width="22" height="22" fill="url(#goldGradPdf)"/>
+    <rect x="0" y="58" width="22" height="22" fill="url(#goldGradPdf)"/>
+    
+    <!-- Y Stem and Arms -->
+    <path d="M 75 85 L 120 160 L 120 250 L 160 250 L 160 160 L 205 85 L 160 85 L 140 125 L 120 85 Z" fill="url(#goldGradPdf)"/>
+    
+    <!-- D Arch -->
+    <path d="M 180 85 H 250 C 295 85 325 115 325 160 C 325 205 295 235 250 235 H 180 Z M 215 115 V 205 H 245 C 275 205 290 185 290 160 C 290 135 275 115 245 115 Z" fill="#FFFFFF"/>
+    
+    <!-- L Arm -->
+    <path d="M 215 160 H 245 V 235 H 310 V 265 H 215 Z" fill="url(#goldGradPdf)"/>
+  </g>
+</svg>

@@ -1,54 +1,61 @@
-/**
+﻿/**
  * ============================================================
  * Store Pinia — Notifications (notification.js)
  * Yass Digital Lab — Frontend Vue 3
  * ============================================================
- * Gère le centre de notifications de l'espace client.
+ * Gère le centre de notifications avec API REST & Polling.
  * ============================================================
  */
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import api from '../api';
 
 const DEFAULT_NOTIFICATIONS = [
   {
     id: 1,
-    type: 'order',
-    title: 'Commande #FA-000001 Validée',
-    desc: 'Votre paiement a été accepté et vos fichiers sont disponibles au téléchargement.',
-    time: 'Il y a 5 min',
-    read: false,
-    link: '/dashboard'
-  },
-  {
-    id: 2,
-    type: 'quote',
-    title: 'Nouvelle Demande de Devis',
-    desc: 'Une proposition pour "Création de site web sur mesure" est en cours de traitement.',
-    time: 'Il y a 1h',
-    read: false,
-    link: '/admin'
-  },
-  {
-    id: 3,
     type: 'promo',
-    title: 'Code Promo Exclusif : YASS20',
-    desc: 'Bénéficiez de 20% de réduction immédiate sur tous nos templates SaaS et packs IA.',
-    time: 'Hier',
-    read: true,
+    title: 'Bienvenue sur Yass Digital Lab !',
+    desc: 'Explorez notre catalogue de templates SaaS et packs IA.',
+    time: 'À l\'instant',
+    read: false,
     link: '/products'
   }
 ];
 
 export const useNotificationStore = defineStore('notifications', () => {
-  const notifications = ref(
-    JSON.parse(localStorage.getItem('user_notifications')) || DEFAULT_NOTIFICATIONS
-  );
-
+  const notifications = ref([]);
   const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
+  
+  let pollingInterval = null;
 
-  const saveToStorage = () => {
-    localStorage.setItem('user_notifications', JSON.stringify(notifications.value));
+  const loadFromApi = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      notifications.value = DEFAULT_NOTIFICATIONS;
+      return;
+    }
+    try {
+      const res = await api.get('/user/notifications');
+      notifications.value = res.data || [];
+    } catch (e) {
+      console.error('Erreur chargement notifications:', e);
+    }
+  };
+
+  const startPolling = () => {
+    loadFromApi();
+    if (!pollingInterval) {
+      pollingInterval = setInterval(loadFromApi, 60000); // Check every minute
+    }
+  };
+
+  const stopPolling = () => {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
+    }
+    notifications.value = DEFAULT_NOTIFICATIONS;
   };
 
   const addNotification = ({ type = 'system', title, desc, link = null }) => {
@@ -61,33 +68,51 @@ export const useNotificationStore = defineStore('notifications', () => {
       read: false,
       link
     });
-    saveToStorage();
   };
 
-  const markAsRead = (id) => {
+  const markAsRead = async (id) => {
     const item = notifications.value.find(n => n.id === id);
-    if (item) {
+    if (item && !item.read) {
       item.read = true;
-      saveToStorage();
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          await api.post(`/user/notifications/${id}/mark-read`);
+        } catch (_) {}
+      }
     }
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     notifications.value.forEach(n => n.read = true);
-    saveToStorage();
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        await api.post('/user/notifications/mark-read');
+      } catch (_) {}
+    }
   };
 
-  const clearAll = () => {
+  const clearAll = async () => {
     notifications.value = [];
-    saveToStorage();
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        await api.delete('/user/notifications');
+      } catch (_) {}
+    }
   };
 
   return {
     notifications,
     unreadCount,
+    loadFromApi,
+    startPolling,
+    stopPolling,
     addNotification,
     markAsRead,
     markAllAsRead,
     clearAll
   };
 });
+

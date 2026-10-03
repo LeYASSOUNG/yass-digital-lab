@@ -1,355 +1,82 @@
 <template>
-  <div class="app-layout" style="display: flex; flex-direction: column; min-height: 100vh;">
+  <div class="app-layout flex flex-col min-h-screen">
     <!-- Background Video -->
     <video class="bg-video" autoplay loop muted playsinline>
       <source src="/background.mp4" type="video/mp4" />
     </video>
     
-    <!-- Global Toast Notifications -->
+    <!-- Global Notifications -->
     <ToastContainer />
     
-    <!-- Top Bar Notice -->
-    <div style="background: linear-gradient(90deg, var(--color-primary), #1e293b, var(--color-primary)); color: #FFF; padding: 6px 16px; font-size: 0.8rem; text-align: center; border-bottom: 1px solid var(--color-border); font-weight: 500;">
-      {{ t('promoNotice') }}
-    </div>
+    <!-- Extracted Header (Nav, Mobile Menu, User) -->
+    <AppHeader />
 
-    <!-- Header Navigation Redesigned -->
-    <header translate="no" class="notranslate glass header-nav" style="padding: 0.6rem 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(28px); border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
-      <div style="max-width: 1440px; margin: 0 auto; padding: 0 16px;" class="flex justify-between items-center gap-2">
-        
-        <!-- Official Logo (Compact Header Mode) -->
-        <Logo :size="34" :showTagline="false" />
-
-        <!-- Central Navigation Links -->
-        <nav class="flex gap-1 items-center" id="main-nav">
-          <router-link to="/" class="nav-link">{{ t('home') }}</router-link>
-          <router-link to="/products" class="nav-link">{{ t('products') }}</router-link>
-          <router-link to="/services" class="nav-link">{{ t('services') }}</router-link>
-          <router-link to="/blog" class="nav-link">{{ t('blog') }}</router-link>
-          <router-link to="/about" class="nav-link">{{ t('about') }}</router-link>
-          <router-link to="/contact" class="nav-link">{{ t('contact') }}</router-link>
-        </nav>
-
-        <!-- Right Side Action Controls -->
-        <div class="flex items-center gap-2" id="header-actions">
-          
-          <!-- Live Search Bar -->
-          <div style="position: relative; width: 130px;" class="search-box">
-            <div style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); display: flex; align-items: center; pointer-events: none;">
-              <Search :size="14" />
-            </div>
-            <input 
-              v-model="searchQuery" 
-              @focus="searchFocused = true"
-              @blur="setTimeout(() => searchFocused = false, 200)"
-              type="text" 
-              placeholder="Rechercher..." 
-              style="width: 100%; padding: 5px 10px 5px 28px; border-radius: 999px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: 0.78rem;"
-            />
-
-            <!-- Dropdown Results -->
-            <div v-if="searchFocused && searchResults.length > 0" class="glass" style="position: absolute; top: 36px; right: 0; width: 240px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; background: var(--color-bg-card);">
-              <router-link 
-                v-for="res in searchResults" 
-                :key="res.id" 
-                :to="res.url"
-                class="flex items-center gap-2"
-                style="padding: 9px 12px; text-decoration: none; color: var(--color-text); border-bottom: 1px solid var(--color-border); font-size: 0.82rem;"
-              >
-                <component :is="res.iconComponent" :size="15" style="color: var(--color-accent);" />
-                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ res.title }}</span>
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Panier Pill -->
-          <router-link to="/checkout" class="cart-pill" style="position: relative; display: flex; align-items: center; gap: 5px; padding: 5px 11px; background: rgba(212,175,55,0.12); border-radius: 999px; border: 1px solid rgba(212,175,55,0.3); font-weight: 700; color: var(--color-text); text-decoration: none; font-size: 0.78rem; white-space: nowrap;">
-            <ShoppingCart :size="15" style="color: var(--color-accent);" /> 
-            <span>{{ t('cart') }}</span>
-            <span v-if="cart.totalItems > 0" style="background: var(--color-accent); color: #050811; border-radius: 50%; width: 17px; height: 17px; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: 2px;">
-              {{ cart.totalItems }}
-            </span>
-          </router-link>
-
-          <!-- Auth / Dashboard Buttons -->
-          <router-link v-if="!auth.token" to="/login" class="btn btn-secondary" style="padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; border-color: var(--color-accent); color: var(--color-accent); font-weight: 700; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
-            <LogIn :size="14" />
-            <span>{{ t('login') }}</span>
-          </router-link>
-          <template v-else>
-            <router-link v-if="isAdmin" to="/admin" class="btn btn-primary" style="padding: 5px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #F0CC55, #D4AF37); color: #050811; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; border: none; box-shadow: 0 2px 10px rgba(212,175,55,0.3);">
-              ⚡ <span>Dashboard Admin</span>
-            </router-link>
-            <router-link to="/dashboard" class="btn btn-secondary" style="padding: 5px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
-              <User :size="14" />
-              <span>{{ t('mySpace') }}</span>
-            </router-link>
-          </template>
-
-          <!-- Utility Group Pill (Notifs + FR/EN + Theme) -->
-          <div class="flex items-center gap-1" style="background: rgba(255,255,255,0.05); padding: 2px 4px; border-radius: 999px; border: 1px solid var(--color-border); white-space: nowrap;">
-            <NotificationCenter />
-            
-            <button @click="handleToggleLang" title="Langue" style="background: none; border: none; padding: 3px 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; color: var(--color-text); display: inline-flex; align-items: center; gap: 3px;">
-              <Globe :size="13" style="color: var(--color-accent);" />
-              {{ currentLang === 'fr' ? 'FR' : 'EN' }}
-            </button>
-
-            <button @click="toggleTheme" title="Changer le thème" style="background: none; border: none; width: 26px; height: 26px; cursor: pointer; color: var(--color-accent); display: flex; align-items: center; justify-content: center;">
-              <Sun v-if="isDark" :size="15" />
-              <Moon v-else :size="15" />
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Mobile Burger Trigger -->
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="burger-btn" style="display: none; background: none; border: 1px solid var(--color-border); border-radius: 10px; padding: 8px 12px; cursor: pointer; color: var(--color-text);">
-          <X v-if="mobileMenuOpen" :size="20" />
-          <Menu v-else :size="20" />
-        </button>
-      </div>
-
-      <!-- Mobile Dropdown Menu -->
-      <div v-if="mobileMenuOpen" class="mobile-menu" style="padding: 20px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--color-border); margin-top: 12px; background: var(--color-bg-card);">
-        <router-link to="/" class="nav-link" @click="mobileMenuOpen = false">{{ t('home') }}</router-link>
-        <router-link to="/products" class="nav-link" @click="mobileMenuOpen = false">{{ t('products') }}</router-link>
-        <router-link to="/services" class="nav-link" @click="mobileMenuOpen = false">{{ t('services') }}</router-link>
-        <router-link to="/blog" class="nav-link" @click="mobileMenuOpen = false">{{ t('blog') }}</router-link>
-        <router-link to="/about" class="nav-link" @click="mobileMenuOpen = false">{{ t('about') }}</router-link>
-        <router-link to="/contact" class="nav-link" @click="mobileMenuOpen = false">{{ t('contact') }}</router-link>
-        <router-link to="/checkout" class="nav-link flex items-center gap-2" @click="mobileMenuOpen = false">
-          <ShoppingCart :size="16" /> {{ t('cart') }} ({{ cart.totalItems }})
-        </router-link>
-        <router-link v-if="!auth.token" to="/login" class="btn btn-primary flex justify-center items-center gap-2" @click="mobileMenuOpen = false">
-          <LogIn :size="16" /> {{ t('login') }}
-        </router-link>
-        <router-link v-else to="/dashboard" class="btn btn-primary flex justify-center items-center gap-2" @click="mobileMenuOpen = false">
-          <User :size="16" /> {{ t('mySpace') }}
-        </router-link>
-      </div>
-    </header>
-
-    <!-- Main View Outlet -->
+    <!-- Main View -->
     <main class="container" style="flex: 1; padding-bottom: 60px;">
-      <router-view></router-view>
+      <router-view v-slot="{ Component }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </router-view>
     </main>
 
-    <!-- Footer -->
-    <footer style="background: rgba(5, 8, 17, 0.88); backdrop-filter: blur(20px); border-top: 1px solid var(--color-accent); padding: 70px 20px 30px; margin-top: 40px; color: #FFFFFF; box-shadow: 0 -10px 40px rgba(0,0,0,0.5);">
-      <div class="container">
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 40px; margin-bottom: 50px;">
-          
-          <!-- Brand Column -->
-          <div>
-            <div class="mb-4">
-              <Logo :size="48" :showTagline="true" :inverted="true" />
-            </div>
-            <p style="color: rgba(255,255,255,0.92); font-size: 0.98rem; line-height: 1.7; margin-bottom: 20px;">
-              Créateur d'outils numériques intelligents, templates SaaS et solutions d'intelligence artificielle sur mesure.
-            </p>
-            <div class="flex gap-3">
-              <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" title="Mon Portfolio Vercel" style="width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--color-accent); background: rgba(212,175,55,0.2); color: var(--color-accent); display: flex; align-items: center; justify-content: center; text-decoration: none;">
-                <Globe :size="19" />
-              </a>
-              <a href="https://github.com/LeYASSOUNG" target="_blank" title="GitHub" style="width: 38px; height: 38px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.4); color: #FFF; display: flex; align-items: center; justify-content: center; text-decoration: none;">
-                <Github :size="19" />
-              </a>
-              <a href="#" title="LinkedIn" style="width: 38px; height: 38px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.4); color: #FFF; display: flex; align-items: center; justify-content: center; text-decoration: none;">
-                <Linkedin :size="19" />
-              </a>
-            </div>
-          </div>
+    <!-- Extracted Footer -->
+    <AppFooter @open-status-modal="showStatusModal = true" />
 
-          <!-- Navigation Links -->
-          <div>
-            <h4 style="margin-bottom: 18px; font-size: 1.08rem; color: #F0CC55; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">Navigation Rapide</h4>
-            <div class="flex flex-col gap-2">
-              <router-link to="/products" class="footer-link flex items-center gap-2" style="color: #FFFFFF; font-size: 0.96rem; font-weight: 500;"><Package :size="16" /> {{ t('products') }}</router-link>
-              <router-link to="/services" class="footer-link flex items-center gap-2" style="color: #FFFFFF; font-size: 0.96rem; font-weight: 500;"><Briefcase :size="16" /> {{ t('services') }}</router-link>
-              <router-link to="/blog" class="footer-link flex items-center gap-2" style="color: #FFFFFF; font-size: 0.96rem; font-weight: 500;"><FileText :size="16" /> {{ t('blog') }}</router-link>
-              <router-link to="/about" class="footer-link flex items-center gap-2" style="color: #FFFFFF; font-size: 0.96rem; font-weight: 500;"><User :size="16" /> {{ t('about') }}</router-link>
-              <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" class="footer-link flex items-center gap-2" style="color: #F0CC55; font-weight: 700; font-size: 0.96rem;">
-                <Globe :size="16" /> Mon Portfolio <ExternalLink :size="14" />
-              </a>
-              <router-link to="/contact" class="footer-link flex items-center gap-2" style="color: #FFFFFF; font-size: 0.96rem; font-weight: 500;"><Mail :size="16" /> {{ t('contact') }}</router-link>
-            </div>
-          </div>
-
-          <!-- Newsletter Column -->
-          <div>
-            <h4 style="margin-bottom: 14px; font-size: 1.08rem; color: #F0CC55; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">{{ t('newsletterTitle') }}</h4>
-            <p style="color: rgba(255,255,255,0.92); font-size: 0.95rem; margin-bottom: 16px; line-height: 1.6;">
-              {{ t('newsletterSub') }}
-            </p>
-            <form @submit.prevent="subscribeNewsletter" class="flex gap-2">
-              <input v-model="newsletterEmail" type="email" placeholder="votre@email.com" required style="flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--color-accent); background: #FFFFFF; color: #050811; font-weight: 600; font-size: 0.95rem;" />
-              <button type="submit" class="btn btn-primary" :disabled="subscribing" style="padding: 11px 16px; display: inline-flex; align-items: center; justify-content: center;">
-                <ArrowRight v-if="!subscribing" :size="18" />
-                <span v-else>...</span>
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div style="border-top: 1px solid rgba(212,175,55,0.25); padding-top: 24px; text-align: center; color: rgba(255,255,255,0.9); font-size: 0.92rem; flex-wrap: wrap; gap: 10px;" class="flex justify-between items-center">
-          <span>© 2026 Yass Digital Lab — {{ t('footerRights') }}</span>
-          <a href="https://portfolio-tau-inky-96i2vyeddb.vercel.app/" target="_blank" style="color: #F0CC55; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-            <Globe :size="15" />
-            <span>Portfolio Créateur : Diarrassouba Yassoungo Youssouf</span>
-            <ExternalLink :size="13" />
-          </a>
-        </div>
-      </div>
-    </footer>
+    <!-- Modals & Overlays -->
+    <SystemStatusModal v-if="showStatusModal" @close="showStatusModal = false" />
     <ChatWidget />
+    <PwaInstallPrompt />
   </div>
 </template>
 
 <script setup>
-import { useCartStore } from './stores/cart';
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from './stores/auth';
 import { useToastStore } from './stores/toast';
-import { currentLang, toggleLang, t } from './i18n';
-import { ref, computed, onMounted } from 'vue';
-import Logo from './components/Logo.vue';
+import { useNotificationStore } from './stores/notification';
+
+// Core Layout
+import AppHeader from './components/layout/AppHeader.vue';
+import AppFooter from './components/layout/AppFooter.vue';
+import SystemStatusModal from './components/layout/SystemStatusModal.vue';
+
+// Global Overlays
 import ToastContainer from './components/ToastContainer.vue';
 import ChatWidget from './components/ChatWidget.vue';
-import NotificationCenter from './components/NotificationCenter.vue';
-import api from './api';
-import { 
-  Search, 
-  ShoppingCart, 
-  User, 
-  Sun, 
-  Moon, 
-  Menu, 
-  X, 
-  Globe, 
-  LogIn, 
-  Send, 
-  ArrowRight, 
-  Package, 
-  Briefcase, 
-  FileText, 
-  Mail, 
-  Github, 
-  Linkedin, 
-  ExternalLink 
-} from 'lucide-vue-next';
+import PwaInstallPrompt from './components/PwaInstallPrompt.vue';
 
-const cart = useCartStore();
+const showStatusModal = ref(false);
 const auth = useAuthStore();
 const toastStore = useToastStore();
-const isDark = ref(false);
-const newsletterEmail = ref('');
-const subscribing = ref(false);
-const mobileMenuOpen = ref(false);
-
-const isAdmin = computed(() => {
-  const allowedRoles = ['admin', 'super_admin', 'creator', 'editor', 'support'];
-  return auth.user && allowedRoles.includes(auth.user.role);
-});
-
-const searchQuery = ref('');
-const searchFocused = ref(false);
-
-const allSearchItems = [
-  { id: 1, title: 'Mega Pack Prompts ChatGPT & Claude', iconComponent: Package, url: '/products/1' },
-  { id: 2, title: 'Template SaaS Starter Vue 3 + Laravel 12', iconComponent: Briefcase, url: '/products/2' },
-  { id: 3, title: '10 Prompts IA indispensables', iconComponent: FileText, url: '/blog' },
-  { id: 4, title: 'Création de site web sur mesure', iconComponent: Globe, url: '/services' }
-];
-
-const searchResults = computed(() => {
-  if (!searchQuery.value.trim()) return [];
-  const q = searchQuery.value.toLowerCase();
-  return allSearchItems.filter(item => item.title.toLowerCase().includes(q));
-});
-
-const handleToggleLang = () => {
-  toggleLang();
-  toastStore.showToast(currentLang.value === 'fr' ? 'Langue : Français 🇫🇷' : 'Language: English 🇬🇧', 'info');
-};
-
-const toggleTheme = () => {
-  isDark.value = !isDark.value;
-  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : '');
-  if (!isDark.value) document.documentElement.removeAttribute('data-theme');
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
-};
-
-const subscribeNewsletter = async () => {
-  if (!newsletterEmail.value) return;
-  subscribing.value = true;
-  try {
-    const res = await api.post('/newsletter/subscribe', { email: newsletterEmail.value });
-    toastStore.showToast(res.data.message || 'Inscription réussie !', 'success');
-    newsletterEmail.value = '';
-  } catch (error) {
-    toastStore.showToast(error.response?.status === 422 ? 'Cet e-mail est déjà inscrit.' : 'Erreur, veuillez réessayer.', 'error');
-  }
-  subscribing.value = false;
-};
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    isDark.value = true;
-    document.documentElement.setAttribute('data-theme', 'dark');
+  // Start Notification Polling if logged in
+  if (auth.token) {
+    useNotificationStore().startPolling();
   }
 
-  // Détection automatique du lien de parrainage
+  // Network Listeners
+  const handleOffline = () => toastStore.showToast('⚡ Mode Hors-Ligne — Vos données sont préservées.', 'info');
+  const handleOnline = () => toastStore.showToast('🟢 Connexion Internet rétablie !', 'success');
+  window.addEventListener('offline', handleOffline);
+  window.addEventListener('online', handleOnline);
+
+  // Referral System
   const urlParams = new URLSearchParams(window.location.search);
   const refCode = urlParams.get('ref');
   if (refCode) {
     localStorage.setItem('referral_code', refCode);
-    toastStore.showToast(`🎁 Bienvenue ! Parrainé par ${refCode} — 20% de réduction appliqués avec le code YASS20.`, 'success');
+    toastStore.showToast(`🎁 Bienvenue ! Code parrain ${refCode} — 20% avec YASS20.`, 'success');
   }
 });
 </script>
 
 <style scoped>
-.app-layout {
-  min-height: 100vh;
-}
-.nav-link {
-  padding: 4px 9px;
-  border-radius: 999px;
-  color: var(--color-text);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.82rem;
-  white-space: nowrap !important;
-  display: inline-block;
-  transition: all 0.2s;
-}
-.nav-link:hover, .nav-link.router-link-active {
-  color: var(--color-accent);
-  background: rgba(212, 175, 55, 0.12);
-}
-.search-box {
-  transition: width 0.3s ease;
-}
-.search-box:focus-within {
-  width: 165px !important;
-}
-.cart-pill:hover {
-  background: rgba(212, 175, 55, 0.22) !important;
-  transform: translateY(-1px);
-}
-.footer-link {
-  color: var(--color-text-light);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.2s;
-}
-.footer-link:hover {
-  color: var(--color-accent);
-}
-@media (max-width: 1280px) {
-  #main-nav { display: none; }
-  #header-actions { display: none; }
-  .burger-btn { display: block !important; }
-}
+.app-layout { min-height: 100vh; }
+
+/* Page transitions */
+.page-enter-active, .page-leave-active { transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+.page-enter-from { opacity: 0; transform: translateY(12px); }
+.page-leave-to   { opacity: 0; transform: translateY(-8px); }
 </style>

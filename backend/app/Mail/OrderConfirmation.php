@@ -7,6 +7,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Attachment;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Order;
 
 class OrderConfirmation extends Mailable
@@ -36,5 +38,16 @@ class OrderConfirmation extends Mailable
                 'invoiceUrl'  => $this->invoiceUrl,
             ]
         );
+    }
+
+    public function attachments(): array
+    {
+        $orderNum = str_pad($this->order->id, 6, '0', STR_PAD_LEFT);
+        $pdf = Pdf::loadView('invoice', ['order' => $this->order]);
+        
+        return [
+            Attachment::fromData(fn () => $pdf->output(), "Facture-FA-{$orderNum}.pdf")
+                    ->withMime('application/pdf'),
+        ];
     }
 }

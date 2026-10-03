@@ -1,0 +1,17 @@
+# --- Build output ---
+dist/
+node_modules/
+
+# --- Git ---
+.git/
+.gitignore
+
+# --- Dev Tools ---
+.editorconfig
+*.md
+Dockerfile
+docker/
+
+# --- IDE ---
+.idea/
+.vscode/

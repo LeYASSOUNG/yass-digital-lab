@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ============================================================
  * Store Pinia — Panier d'achat (cart.js)
  * Yass Digital Lab — Frontend Vue 3
@@ -88,3 +88,4 @@ export const useCartStore = defineStore('cart', () => {
   // Exposition des données réactives et des actions
   return { items, addItem, removeItem, clearCart, totalItems, totalPrice }
 })
+

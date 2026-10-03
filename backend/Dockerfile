@@ -1,30 +1,99 @@
-FROM php:8.3-cli
+# ================================================================
+# Dockerfile — Backend Laravel 12 (Multi-Stage Build)
+# ================================================================
+# Stage 1 : deps     → Installe les dépendances Composer
+# Stage 2 : production → Image finale PHP-FPM + Nginx légère
+# ================================================================
 
-# Installation des dépendances requises et de l'extension pdo_pgsql pour Neon PostgreSQL
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-install pdo pdo_pgsql
+# --- Stage 1 : Composer Dependencies ---
+FROM composer:2.8 AS deps
 
-# Installation de Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+WORKDIR /app
 
-WORKDIR /var/www
+# Copier les fichiers Composer en premier (meilleure utilisation du cache)
+COPY composer.json composer.lock ./
 
-# Copie des fichiers du projet
+# Installer les dépendances de production uniquement (sans --dev)
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-scripts
+
+# Copier le reste du code source
 COPY . .
 
-# Installation des dépendances Composer
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Exécuter les scripts post-install manuellement
+RUN composer dump-autoload --optimize --no-dev
 
-# Attribution des permissions aux dossiers de stockage et de cache
-RUN chmod -R 777 storage bootstrap/cache
+# ================================================================
+# --- Stage 2 : Production Image ---
+# ================================================================
+FROM php:8.2-fpm-alpine AS production
 
-# Port d'écoute dynamique fourni par Render
-EXPOSE 8000
+LABEL maintainer="Yass Digital Lab <diarrass1507@gmail.com>"
+LABEL version="2.0.0"
+LABEL description="Laravel 12 API Backend — Yass Digital Lab"
 
-# Commande de démarrage
-CMD php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+# --- Extensions PHP requises ---
+RUN apk add --no-cache \
+        nginx \
+        supervisor \
+        postgresql-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libzip-dev \
+        libxml2-dev \
+        curl \
+        unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        gd \
+        zip \
+        exif \
+        bcmath \
+        opcache \
+        pcntl \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/cache/apk/*
+
+# --- Configuration PHP Optimisée pour Production ---
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+COPY docker/php/php-production.ini $PHP_INI_DIR/conf.d/99-yass.ini
+COPY docker/php/opcache.ini $PHP_INI_DIR/conf.d/98-opcache.ini
+
+# --- Configuration Nginx ---
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
+
+# --- Configuration Supervisor (Gestion PHP-FPM + Nginx) ---
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# --- Code source applicatif ---
+WORKDIR /var/www/html
+
+COPY --from=deps /app .
+
+# --- Permissions Storage & Cache ---
+RUN mkdir -p storage/logs \
+             storage/framework/sessions \
+             storage/framework/views \
+             storage/framework/cache \
+             bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+# --- Script d'entrée (migrations, config:cache, etc.) ---
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

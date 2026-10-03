@@ -105,9 +105,9 @@
                 <tr>
                     <td style="font-weight: bold;">{{ $item->product_title }}</td>
                     <td style="text-align: center;">{{ $item->quantity }}</td>
-                    <td style="text-align: right;">{{ number_format($item->price, 2) }} €</td>
+                    <td style="text-align: right;">{{ number_format($item->price, 0, ',', ' ') }} FCFA</td>
                     <td style="text-align: right; font-weight: bold;">
-                        {{ number_format($item->price * $item->quantity, 2) }} €
+                        {{ number_format($item->price * $item->quantity, 0, ',', ' ') }} FCFA
                     </td>
                 </tr>
                 @endforeach
@@ -118,15 +118,15 @@
             <div class="summary-box">
                 <div class="summary-row">
                     <span>Sous-total HT :</span>
-                    <span>{{ number_format($order->total_amount, 2) }} €</span>
+                    <span>{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
                 </div>
                 <div class="summary-row">
                     <span>TVA (0% - Auto-liquidation) :</span>
-                    <span>0.00 €</span>
+                    <span>0 FCFA</span>
                 </div>
                 <div class="summary-row total-row">
                     <span>Total à Payer :</span>
-                    <span>{{ number_format($order->total_amount, 2) }} €</span>
+                    <span>{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
                 </div>
             </div>
         </div>
