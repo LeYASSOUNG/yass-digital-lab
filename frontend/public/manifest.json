@@ -1,0 +1,44 @@
+{
+  "id": "yass-digital-lab-pwa",
+  "name": "Yass Digital Lab — Marketplace Digital & IA",
+  "short_name": "Yass Lab",
+  "description": "Marketplace premium d'outils numériques, templates SaaS Vue 3/Laravel 12, packs IA et automatisations sur-mesure.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B0F19",
+  "theme_color": "#6366F1",
+  "categories": ["business", "productivity", "shopping", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catalogue Produits",
+      "short_name": "Produits",
+      "description": "Consulter les outils et templates disponibles",
+      "url": "/products",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon Espace Client",
+      "short_name": "Espace Client",
+      "description": "Accéder à vos téléchargements et clés de licence",
+      "url": "/dashboard",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon Panier",
+      "short_name": "Panier",
+      "description": "Finaliser votre commande d'outils numériques",
+      "url": "/checkout",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

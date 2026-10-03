@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="brand-logo flex items-center gap-3" :class="{ 'is-inverted': inverted }">
     <router-link to="/" class="flex items-center gap-3" style="text-decoration: none;">
       
@@ -93,3 +93,4 @@ defineProps({
   color: rgba(255, 255, 255, 0.85) !important;
 }
 </style>
+

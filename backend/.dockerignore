@@ -1,0 +1,36 @@
+# --- Dépendances ---
+vendor/
+node_modules/
+
+# --- Git ---
+.git/
+.gitignore
+
+# --- Logs ---
+storage/logs/*.log
+
+# --- Cache de développement ---
+bootstrap/cache/*.php
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# --- Tests ---
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# --- Dev Tools ---
+.editorconfig
+.env.example
+*.md
+docker-compose*.yml
+Dockerfile
+
+# --- IDE ---
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

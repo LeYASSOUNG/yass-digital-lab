@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="notifications-page" style="margin-top: 20px;">
     
     <!-- Hero Header -->
@@ -16,7 +16,7 @@
     <!-- Stats KPIs -->
     <div class="grid mb-8" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
       
-      <div class="glass" style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid var(--color-accent); background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid var(--color-accent); background: var(--color-bg-card); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
         <div class="flex justify-between items-center mb-2">
           <span style="font-size: 0.88rem; font-weight: 700; color: var(--color-text-light);">Total Alertes</span>
           <div style="width: 36px; height: 36px; border-radius: 12px; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center;">
@@ -26,7 +26,7 @@
         <h3 style="font-size: 2rem; font-weight: 800; color: var(--color-text); margin: 4px 0 0; font-family: var(--font-heading);">{{ notifStore.notifications.length }}</h3>
       </div>
 
-      <div class="glass" style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #ef4444; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #ef4444; background: var(--color-bg-card); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
         <div class="flex justify-between items-center mb-2">
           <span style="font-size: 0.88rem; font-weight: 700; color: var(--color-text-light);">Non Lues</span>
           <div style="width: 36px; height: 36px; border-radius: 12px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); display: flex; align-items: center; justify-content: center;">
@@ -36,7 +36,7 @@
         <h3 style="font-size: 2rem; font-weight: 800; color: #ef4444; margin: 4px 0 0; font-family: var(--font-heading);">{{ notifStore.unreadCount }}</h3>
       </div>
 
-      <div class="glass" style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #10b981; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #10b981; background: var(--color-bg-card); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
         <div class="flex justify-between items-center mb-2">
           <span style="font-size: 0.88rem; font-weight: 700; color: var(--color-text-light);">Commandes & Achats</span>
           <div style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center;">
@@ -46,7 +46,7 @@
         <h3 style="font-size: 2rem; font-weight: 800; color: #10b981; margin: 4px 0 0; font-family: var(--font-heading);">{{ orderCount }}</h3>
       </div>
 
-      <div class="glass" style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #3b82f6; background: var(--color-bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="padding: 22px 24px; border-radius: 20px; border: 1px solid var(--color-border); border-top: 4px solid #3b82f6; background: var(--color-bg-card); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
         <div class="flex justify-between items-center mb-2">
           <span style="font-size: 0.88rem; font-weight: 700; color: var(--color-text-light);">Devis & Prestations</span>
           <div style="width: 36px; height: 36px; border-radius: 12px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); display: flex; align-items: center; justify-content: center;">
@@ -229,8 +229,19 @@ const openLink = (item) => {
 </script>
 
 <style scoped>
+.notifications-page {
+  background: var(--page-gradient);
+  padding: 30px 24px 80px;
+  border-radius: 24px;
+  margin-top: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
+  color: var(--color-text);
+}
+
 .card:hover {
   transform: translateY(-2px);
   border-color: var(--color-accent) !important;
 }
 </style>
+

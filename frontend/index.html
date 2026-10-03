@@ -1,13 +1,101 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    
+    <!-- Primary Meta Tags & SEO -->
+    <title>Yass Digital Lab — Outils Numériques, Agents IA &amp; Templates SaaS</title>
+    <meta name="title" content="Yass Digital Lab — Outils Numériques, Agents IA &amp; Templates SaaS" />
+    <meta name="description" content="Marketplace d'Agents IA autonomes, solutions RAG, templates SaaS Vue 3/Laravel 12, packs de prompts et devis en direct pour entreprises innovantes." />
+    <meta name="keywords" content="agents ia, intelligence artificielle, rag, whatsapp cloud api, templates saas, vue 3, laravel 12, prompts chatgpt, claude 3.7, devis web côte d'ivoire, yass digital lab" />
+    <meta name="author" content="Diarrassouba Yassoungo Youssouf" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://yassdigitallab.com/" />
+    <link rel="alternate" hreflang="fr" href="https://yassdigitallab.com/" />
+    <link rel="alternate" hreflang="en" href="https://yassdigitallab.com/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://yassdigitallab.com/" />
+
+    <!-- PWA Manifest & Mobile Meta -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Yass Lab" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yassdigitallab.com/" />
+    <meta property="og:title" content="Yass Digital Lab — Outils Numériques &amp; Templates SaaS Premium" />
+    <meta property="og:description" content="Accélérez vos projets avec nos templates prêts à l'emploi, automatisations IA et prestations tech sur-mesure." />
+    <meta property="og:image" content="https://portfolio-tau-inky-96i2vyeddb.vercel.app/og-image.png" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:site_name" content="Yass Digital Lab" />
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://yassdigitallab.com/" />
+    <meta property="twitter:title" content="Yass Digital Lab — Outils Numériques &amp; Templates SaaS" />
+    <meta property="twitter:description" content="Accélérez vos projets avec nos templates prêts à l'emploi, automatisations IA et prestations tech sur-mesure." />
+    <meta property="twitter:image" content="https://portfolio-tau-inky-96i2vyeddb.vercel.app/og-image.png" />
+    <meta name="twitter:creator" content="@YassDigitalLab" />
+
+    <!-- JSON-LD Structured Data (Google Rich Results) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://yassdigitallab.com/#organization",
+          "name": "Yass Digital Lab",
+          "url": "https://yassdigitallab.com",
+          "logo": "https://portfolio-tau-inky-96i2vyeddb.vercel.app/og-image.png",
+          "description": "Marketplace de ressources numériques intelligentes — templates SaaS, packs IA, formations et solutions sur mesure.",
+          "founder": {
+            "@type": "Person",
+            "name": "Diarrassouba Yassoungo Youssouf"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "email": "support@yassdigitallab.com",
+            "availableLanguage": ["French", "English"]
+          },
+          "sameAs": [
+            "https://github.com/LeYASSOUNG",
+            "https://portfolio-tau-inky-96i2vyeddb.vercel.app/"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://yassdigitallab.com/#website",
+          "url": "https://yassdigitallab.com",
+          "name": "Yass Digital Lab",
+          "publisher": { "@id": "https://yassdigitallab.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://yassdigitallab.com/products?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          },
+          "inLanguage": ["fr-FR", "en-US"]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+      if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed: ', err));
+        });
+      }
+    </script>
   </body>
 </html>

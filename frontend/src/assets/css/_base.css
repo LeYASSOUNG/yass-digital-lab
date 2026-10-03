@@ -1,0 +1,109 @@
+/* ============================================================
+ * Yass Digital Lab — Obsidian Black Premium Design System v3.0
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ----------------------------------------------------------
+ * Reset & Base
+ * ---------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.bg-video {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  object-fit: cover;
+  z-index: -10;
+  pointer-events: none;
+  opacity: 0.04;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
+
+/* ----------------------------------------------------------
+ * Typography
+ * ---------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900; letter-spacing: -0.03em; }
+h2 { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 800; }
+h3 { font-size: 1.35rem; font-weight: 700; }
+h4 { font-size: 1.1rem; font-weight: 600; }
+
+a { color: var(--color-primary-light); text-decoration: none; transition: var(--transition-base); cursor: pointer; }
+a:hover { color: var(--color-primary); }
+button:not(:disabled), [role="button"], .cursor-pointer { cursor: pointer; }
+
+.gradient-text {
+  background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 50%, #F59E0B 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.gradient-text-gold {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 60%, #D97706 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.gradient-text-hero {
+  background: linear-gradient(135deg, #F59E0B 0%, #F43F5E 40%, #7C3AED 80%, #06B6D4 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* ----------------------------------------------------------
+ * Forms
+ * ---------------------------------------------------------- */
+input, select, textarea {
+  font-family: var(--font-body) !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background-color: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: var(--transition-base);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.2) !important;
+}
+input.input-error { border-color: var(--color-danger) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important; }
+input.input-success { border-color: var(--color-success) !important; box-shadow: 0 0 0 3px rgba(16,185,129,0.15) !important; }
+
+label {
+  font-family: var(--font-body) !important;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.field-error { color: var(--color-danger); font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px; }

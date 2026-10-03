@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="toast-container">
     <TransitionGroup name="toast">
       <div 
@@ -138,3 +138,4 @@ const toastStore = useToastStore();
   transform: translateX(40px) scale(0.9);
 }
 </style>
+

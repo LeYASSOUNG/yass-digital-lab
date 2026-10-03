@@ -51,7 +51,7 @@ class OrderController extends Controller
     /**
      * Affiche une commande spécifique avec ses articles.
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, string $id)
     {
         $order = Order::with('items')->findOrFail($id);
         $user = $request->user();
@@ -69,6 +69,33 @@ class OrderController extends Controller
     public function showBySession(string $sessionId)
     {
         $order = Order::with('items')->where('stripe_session_id', $sessionId)->firstOrFail();
+        
+        // Synchronisation manuelle si la commande est en attente (utile en local sans Webhooks)
+        if ($order->status === 'pending') {
+            if (str_starts_with($sessionId, 'cs_test_mock_')) {
+                $order->update(['status' => 'paid']);
+                if ($order->quote_id) {
+                    \App\Models\QuoteRequest::where('id', $order->quote_id)->update(['status' => 'completed']);
+                }
+            } else {
+                $stripeSecret = env('STRIPE_SECRET');
+                if ($stripeSecret && !str_contains($stripeSecret, 'fake')) {
+                    try {
+                        \Stripe\Stripe::setApiKey($stripeSecret);
+                        $session = \Stripe\Checkout\Session::retrieve($sessionId);
+                        if ($session->payment_status === 'paid') {
+                            $order->update(['status' => 'paid']);
+                            if ($order->quote_id) {
+                                \App\Models\QuoteRequest::where('id', $order->quote_id)->update(['status' => 'completed']);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Erreur vérification manuelle Stripe: ' . $e->getMessage());
+                    }
+                }
+            }
+        }
+
         return response()->json($order);
     }
 
@@ -77,7 +104,7 @@ class OrderController extends Controller
      * Protection anti-IDOR : Nécessite une signature d'URL valide (URL::temporarySignedRoute)
      * OU un compte utilisateur propriétaire de la commande OU un administrateur.
      */
-    public function downloadInvoice(Request $request, $id)
+    public function downloadInvoice(Request $request, string $id)
     {
         $order = Order::with('items')->findOrFail($id);
         $user = $request->user();
@@ -99,7 +126,7 @@ class OrderController extends Controller
     /**
      * Téléchargement de facture dédié aux administrateurs (protégé par middleware de rôle).
      */
-    public function downloadInvoiceAdmin($id)
+    public function downloadInvoiceAdmin(string $id)
     {
         $order = Order::with('items')->findOrFail($id);
         $pdf = Pdf::loadView('invoice', compact('order'));

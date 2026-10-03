@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5D77F"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA820A"/>
+    </linearGradient>
+    <linearGradient id="whiteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="500" height="500" rx="40" fill="#0F172A"/>
+
+  <!-- YDL Digital Pixel Emblem -->
+  <g transform="translate(100, 70)">
+    <!-- Pixels above Y -->
+    <rect x="25" y="25" width="20" height="20" fill="url(#goldGrad)"/>
+    <rect x="55" y="25" width="20" height="20" fill="url(#goldGrad)"/>
+    <rect x="55" y="55" width="20" height="20" fill="url(#goldGrad)"/>
+    <rect x="0" y="55" width="20" height="20" fill="url(#goldGrad)"/>
+    
+    <!-- Y Stem and Arms -->
+    <path d="M 75 85 L 120 160 L 120 250 L 160 250 L 160 160 L 205 85 L 160 85 L 140 125 L 120 85 Z" fill="url(#goldGrad)"/>
+    
+    <!-- D Arch -->
+    <path d="M 180 85 H 250 C 295 85 325 115 325 160 C 325 205 295 235 250 235 H 180 Z M 215 115 V 205 H 245 C 275 205 290 185 290 160 C 290 135 275 115 245 115 Z" fill="url(#whiteGrad)"/>
+    
+    <!-- L Arm -->
+    <path d="M 215 160 H 245 V 235 H 310 V 265 H 215 Z" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- YASS DIGITAL LAB Text -->
+  <text x="250" y="380" font-family="'Inter', sans-serif" font-weight="800" font-size="36" letter-spacing="4" text-anchor="middle">
+    <tspan fill="url(#goldGrad)">YASS </tspan>
+    <tspan fill="url(#whiteGrad)">DIGITAL </tspan>
+    <tspan fill="url(#goldGrad)">LAB</tspan>
+  </text>
+</svg>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="notification-center-wrapper" style="position: relative;">
     <!-- Bell Trigger Button -->
     <button @click="goToNotifications" class="notif-btn" title="Voir la page de notifications">
@@ -15,30 +15,30 @@
         <div class="notif-header">
           <div class="flex justify-between items-center mb-3">
             <div class="flex items-center gap-2">
-              <Bell :size="16" style="color: var(--color-accent);" />
+              <Bell :size="16" style="color: var(--color-primary);" />
               <span style="font-weight: 800; font-size: 0.95rem; color: var(--color-text);">Notifications</span>
-              <span v-if="notifStore.unreadCount > 0" style="background: var(--color-accent); color: #050811; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
+              <span v-if="notifStore.unreadCount > 0" class="badge-pill badge-indigo" style="font-size: 0.7rem; padding: 2px 8px;">
                 {{ notifStore.unreadCount }} non lue(s)
               </span>
             </div>
-            <button @click="isOpen = false" style="background: none; border: none; cursor: pointer; color: var(--color-text-light);">
+            <button @click="isOpen = false" style="background: none; border: none; cursor: pointer; color: var(--color-text-muted);">
               <X :size="16" />
             </button>
           </div>
 
           <!-- Tabs Filter -->
-          <div class="flex gap-2" style="background: rgba(0,0,0,0.1); padding: 3px; border-radius: 8px;">
+          <div class="flex gap-2" style="background: rgba(99,102,241,0.06); padding: 4px; border-radius: var(--radius-md);">
             <button 
               @click="activeFilter = 'all'"
-              :style="activeFilter === 'all' ? 'background: var(--color-bg-card); color: var(--color-accent); font-weight: 700;' : 'color: var(--color-text-light);'"
-              style="flex: 1; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;"
+              :style="activeFilter === 'all' ? 'background: var(--color-bg-card); color: var(--color-primary); font-weight: 700;' : 'color: var(--color-text-muted);'"
+              style="flex: 1; border: none; padding: 4px 8px; border-radius: var(--radius-md); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;"
             >
               Toutes ({{ notifStore.notifications.length }})
             </button>
             <button 
               @click="activeFilter = 'unread'"
-              :style="activeFilter === 'unread' ? 'background: var(--color-bg-card); color: var(--color-accent); font-weight: 700;' : 'color: var(--color-text-light);'"
-              style="flex: 1; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;"
+              :style="activeFilter === 'unread' ? 'background: var(--color-bg-card); color: var(--color-primary); font-weight: 700;' : 'color: var(--color-text-muted);'"
+              style="flex: 1; border: none; padding: 4px 8px; border-radius: var(--radius-md); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;"
             >
               Non lues ({{ notifStore.unreadCount }})
             </button>
@@ -252,3 +252,4 @@ const handleNotificationClick = (item) => {
   transform: translateY(-10px) scale(0.95);
 }
 </style>
+

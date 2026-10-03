@@ -155,4 +155,33 @@ class UserController extends Controller
             'user'    => $user
         ]);
     }
+
+    /**
+     * Récupère la liste des achats (commandes payées) de l'utilisateur connecté.
+     */
+    public function purchases(Request $request)
+    {
+        $user = $request->user();
+        $orders = \App\Models\Order::with('items')
+            ->where('email', $user->email)
+            ->where('status', 'paid')
+            ->latest()
+            ->get();
+
+        $purchases = [];
+        foreach ($orders as $order) {
+            foreach ($order->items as $item) {
+                $purchases[] = [
+                    'id'          => $item->id,
+                    'order_id'    => $order->id,
+                    'title'       => $item->product_title,
+                    'price'       => $item->price,
+                    'licenseKey'  => 'YASS-LIC-' . strtoupper(substr(md5($order->id . $item->id), 0, 8)),
+                    'date'        => $order->created_at->format('d/m/Y'),
+                ];
+            }
+        }
+
+        return response()->json($purchases);
+    }
 }

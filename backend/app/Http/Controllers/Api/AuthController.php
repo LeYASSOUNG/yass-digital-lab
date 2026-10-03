@@ -58,13 +58,9 @@ class AuthController extends Controller
                 Log::error('Erreur envoi notification verification email: ' . $e->getMessage());
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
             return response()->json([
-                'access_token' => $token,
-                'token_type'   => 'Bearer',
                 'user'         => $user,
-                'message'      => 'Compte client créé avec succès. Un email de vérification vous a été envoyé.'
+                'message'      => 'Compte client créé avec succès. Un code de vérification vous a été envoyé.'
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -73,6 +69,19 @@ class AuthController extends Controller
             ], 422);
         } catch (\Throwable $e) {
             Log::error('Erreur Register: '.$e->getMessage());
+            
+            if (app()->environment('local') && (str_contains($e->getMessage(), 'Connection refused') || str_contains($e->getMessage(), 'could not connect to server') || str_contains($e->getMessage(), 'recovery'))) {
+                return response()->json([
+                    'user' => [
+                        'id' => random_int(10, 999),
+                        'name' => 'Utilisateur Mock',
+                        'email' => 'mock@yass.com',
+                        'role' => 'client'
+                    ],
+                    'message' => 'Compte client créé (MOCK OFFLINE).'
+                ], 201);
+            }
+
             return response()->json([
                 'message' => 'Erreur serveur lors de l\'inscription: ' . $e->getMessage()
             ], 500);
@@ -91,6 +100,8 @@ class AuthController extends Controller
             ]);
 
             if (Auth::attempt($credentials)) {
+                \Illuminate\Support\Facades\Log::info("Login success: ", $credentials);
+                /** @var User $user */
                 $user  = Auth::user();
                 $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -101,6 +112,7 @@ class AuthController extends Controller
                 ]);
             }
 
+            \Illuminate\Support\Facades\Log::info("Login attempt failed for: ", $credentials);
             return response()->json([
                 'message' => 'Identifiants invalides'
             ], 401);
@@ -111,6 +123,22 @@ class AuthController extends Controller
             ], 422);
         } catch (\Throwable $e) {
             Log::error('Erreur Login: '.$e->getMessage());
+            
+            // Fallback fictif si la base de données est down (pour tester le frontend)
+            if (app()->environment('local') && (str_contains($e->getMessage(), 'Connection refused') || str_contains($e->getMessage(), 'could not connect to server') || str_contains($e->getMessage(), 'recovery'))) {
+                return response()->json([
+                    'access_token' => 'mock_token_12345',
+                    'token_type'   => 'Bearer',
+                    'user'         => [
+                        'id' => 1,
+                        'name' => 'John Doe (Mock)',
+                        'email' => $credentials['email'] ?? 'mock@yass.com',
+                        'role' => 'client',
+                        'email_verified_at' => now()
+                    ]
+                ]);
+            }
+
             return response()->json([
                 'message' => 'Erreur serveur lors de la connexion: ' . $e->getMessage()
             ], 500);
@@ -137,14 +165,18 @@ class AuthController extends Controller
         ]);
 
         try {
-            Password::sendResetLink($request->only('email'));
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                $user->generateOtp();
+                $user->notify(new \App\Notifications\ResetPasswordOtpNotification());
+            }
         } catch (\Throwable $e) {
             Log::error('Erreur envoi réinitialisation mot de passe: ' . $e->getMessage());
         }
 
         return response()->json([
             'message' => 'Si cette adresse email est enregistrée dans notre système, ' .
-                         'vous recevrez un lien de réinitialisation d\'ici quelques instants.'
+                         'vous recevrez un code OTP d\'ici quelques instants.'
         ]);
     }
 
@@ -155,63 +187,116 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token'    => 'required|string',
             'email'    => 'required|email',
+            'otp'      => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ], [
             'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.'
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
+        $user = User::where('email', $request->email)->first();
 
-                $user->save();
-
-                // Déclencher l'événement standard Laravel de réinitialisation
-                event(new PasswordReset($user));
-
-                // Révocation de tous les tokens d'accès Sanctum existants
-                $user->tokens()->delete();
-            }
-        );
-
-        if ($status === Password::PASSWORD_RESET) {
+        if (!$user || $user->otp_code !== $request->otp || now()->greaterThan($user->otp_expires_at)) {
             return response()->json([
-                'message' => 'Votre mot de passe a été réinitialisé avec succès. ' .
-                             'Veuillez vous re-connecter avec vos nouveaux identifiants.'
-            ]);
+                'message' => 'Le code OTP est invalide ou a expiré.'
+            ], 400);
         }
 
+        // Met à jour le mot de passe
+        $user->forceFill([
+            'password' => Hash::make($request->password)
+        ])->setRememberToken(Str::random(60));
+
+        $user->otp_code = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        // Déclencher l'événement standard Laravel
+        event(new PasswordReset($user));
+
+        // Révocation de tous les tokens d'accès Sanctum existants
+        $user->tokens()->delete();
+
         return response()->json([
-            'message' => 'Le jeton de réinitialisation est invalide ou a expiré.'
-        ], 400);
+            'message' => 'Votre mot de passe a été réinitialisé avec succès. ' .
+                         'Veuillez vous re-connecter avec vos nouveaux identifiants.'
+        ]);
     }
 
     /**
      * Vérifie l'adresse email de l'utilisateur via une URL signée.
      */
-    public function verifyEmail(Request $request)
+    public function verifyEmail(Request $request, $id, $hash)
     {
-        $user = User::findOrFail($request->route('id'));
+        $user = User::findOrFail($id);
 
-        $expectedHash = hash('sha256', $user->getEmailForVerification());
-        if (!hash_equals((string) $request->route('hash'), $expectedHash)) {
-            return response()->json(['message' => 'Lien de vérification invalide ou altéré.'], 403);
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Lien de vérification invalide.'], 403);
         }
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Cette adresse email est déjà vérifiée.']);
+            return response()->json(['message' => 'Email déjà vérifié.'], 400);
         }
 
-        if ($user->markEmailAsVerified()) {
-            event(new \Illuminate\Auth\Events\Verified($user));
-        }
+        $user->markEmailAsVerified();
+
+        // Envoi de la notification in-app de bienvenue
+        $user->notify(new \App\Notifications\SystemNotification(
+            'promo',
+            'Bienvenue sur Yass Digital Lab !',
+            'Votre compte est désormais activé. Explorez notre catalogue de templates SaaS et packs IA.',
+            '/products'
+        ));
 
         return response()->json(['message' => 'Votre adresse email a été vérifiée avec succès !']);
+    }
+
+    /**
+     * Vérifie l'adresse email de l'utilisateur via le code OTP.
+     */
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp'   => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur introuvable.'], 404);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email déjà vérifié.'], 400);
+        }
+
+        if ($user->otp_code !== $request->otp || now()->greaterThan($user->otp_expires_at)) {
+            return response()->json(['message' => 'Code OTP invalide ou expiré.'], 400);
+        }
+
+        $user->markEmailAsVerified();
+        $user->otp_code = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        // Envoi de la notification in-app de bienvenue
+        $user->notify(new \App\Notifications\SystemNotification(
+            'promo',
+            'Bienvenue sur Yass Digital Lab !',
+            'Votre compte est désormais activé. Explorez notre catalogue de templates SaaS et packs IA.',
+            '/products'
+        ));
+
+        // Create token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Votre adresse email a été vérifiée avec succès !',
+            'access_token' => $token,
+            'token_type'   => 'Bearer',
+            'user'         => $user
+        ]);
     }
 
     /**
@@ -229,6 +314,6 @@ class AuthController extends Controller
             Log::error('Erreur renvoi verification email: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => 'Un nouveau lien de vérification a été envoyé à votre adresse email.']);
+        return response()->json(['message' => 'Un nouveau code de vérification a été envoyé à votre adresse email.']);
     }
 }

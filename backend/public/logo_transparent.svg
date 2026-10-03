@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 110">
+  <!-- Pixel dots top-left - solid gold, no gradient -->
+  <rect x="4"  y="4"  width="11" height="11" fill="#F5C027"/>
+  <rect x="20" y="4"  width="11" height="11" fill="#F5C027"/>
+  <rect x="20" y="20" width="11" height="11" fill="#F5C027"/>
+  <rect x="4"  y="20" width="11" height="11" fill="#F5C027"/>
+
+  <!-- Y letter - solid gold -->
+  <path d="M36 36 L54 64 L54 90 L68 90 L68 64 L86 36 L70 36 L61 52 L52 36 Z" fill="#F5C027"/>
+
+  <!-- D letter - solid white -->
+  <path d="M90 36 H120 C140 36 152 48 152 63 C152 78 140 90 120 90 H90 Z M104 50 V76 H118 C130 76 138 70 138 63 C138 56 130 50 118 50 Z" fill="#FFFFFF"/>
+
+  <!-- L letter - solid gold -->
+  <path d="M104 63 H118 V90 H145 V103 H104 Z" fill="#F5C027"/>
+
+  <!-- Brand name text - solid colors, no gradient -->
+  <text x="162" y="52" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="22" fill="#F5C027" letter-spacing="1">YASS</text>
+  <text x="162" y="72" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="16" fill="#FFFFFF" letter-spacing="0.5">DIGITAL</text>
+  <text x="162" y="92" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="16" fill="#F5C027" letter-spacing="0.5">LAB</text>
+</svg>
