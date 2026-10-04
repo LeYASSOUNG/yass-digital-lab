@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Log;
 
 class GeniusPayService
 {
-    protected string $apiKey;
-    protected string $apiSecret;
-    protected string $baseUrl;
+    protected ?string $apiKey;
+    protected ?string $apiSecret;
+    protected ?string $baseUrl;
 
     public function __construct()
     {
