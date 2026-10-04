@@ -92,8 +92,14 @@ return [
 
         'pgsql' => [
             'driver'         => 'pgsql',
+            // DATABASE_URL est prioritaire (format Neon/Render/Railway)
+            // Laravel sait parser une URL de connexion nativement via la clé 'url'
             'url'            => env('DATABASE_URL'),
-            'host'           => env('DB_HOST', '127.0.0.1'),
+            // Ces valeurs sont utilisées uniquement si DATABASE_URL n'est pas définie
+            // On filtre DB_HOST si c'est une URL complète (bug Render)
+            'host'     => (env('DB_HOST') && !str_contains((string) env('DB_HOST'), '://'))
+                ? env('DB_HOST')
+                : '127.0.0.1',
             'port'           => env('DB_PORT', '5432'),
             'database'       => env('DB_DATABASE', 'laravel'),
             'username'       => env('DB_USERNAME', 'root'),

@@ -1,7 +1,7 @@
 #!/bin/sh
 # ================================================================
 # Entrypoint Script — Backend Laravel
-# S'exécute au démarrage du conteneur avant le CMD
+# Compatible Render / Railway / Neon / local Docker
 # ================================================================
 set -e
 
@@ -10,58 +10,47 @@ echo "   Yass Digital Lab — Backend Startup"
 echo "=============================================="
 
 # ---------------------------------------------------------------
-# Si DATABASE_URL est fournie (format Neon/Supabase/Heroku),
-# on extrait les variables individuelles dont Laravel a besoin.
-# Format attendu : postgresql://user:pass@host/dbname?sslmode=require
+# Déterminer la DSN de connexion PostgreSQL
+# Priorité : DATABASE_URL > variables individuelles DB_*
 # ---------------------------------------------------------------
 if [ -n "$DATABASE_URL" ]; then
-    echo "🔗 Parsing DATABASE_URL..."
-    # Supprimer le préfixe postgresql:// ou postgres://
-    _URL=$(echo "$DATABASE_URL" | sed -e 's|^postgres://||' -e 's|^postgresql://||')
-    # user:pass@host:port/dbname?params
-    _USERINFO=$(echo "$_URL" | cut -d'@' -f1)
-    _HOSTINFO=$(echo "$_URL" | cut -d'@' -f2)
-
-    export DB_USERNAME=$(echo "$_USERINFO" | cut -d':' -f1)
-    export DB_PASSWORD=$(echo "$_USERINFO" | cut -d':' -f2)
-
-    _HOST_PORT=$(echo "$_HOSTINFO" | cut -d'/' -f1)
-    export DB_HOST=$(echo "$_HOST_PORT" | cut -d':' -f1)
-    _PORT=$(echo "$_HOST_PORT" | cut -d':' -f2)
-    export DB_PORT=${_PORT:-5432}
-
-    _DBNAME=$(echo "$_HOSTINFO" | cut -d'/' -f2 | cut -d'?' -f1)
-    export DB_DATABASE="$_DBNAME"
-
-    echo "   Host    : $DB_HOST"
-    echo "   Port    : $DB_PORT"
-    echo "   Database: $DB_DATABASE"
-    echo "   User    : $DB_USERNAME"
+    echo "🔗 Mode DATABASE_URL détecté (Neon/Render/Railway)"
+    DB_CONNECT_MODE="url"
+else
+    echo "🔗 Mode variables individuelles DB_* détecté"
+    DB_CONNECT_MODE="vars"
 fi
 
 # ---------------------------------------------------------------
-# Attendre que PostgreSQL soit prêt (max 60s)
+# Test de connexion PostgreSQL (max 60s)
+# On utilise PHP pour parser DATABASE_URL proprement
 # ---------------------------------------------------------------
 MAX_RETRIES=30
 RETRIES=0
 
-echo "⏳ Waiting for PostgreSQL at $DB_HOST:${DB_PORT:-5432}..."
+echo "⏳ Attente de PostgreSQL..."
+
 until php -r "
     try {
-        if (getenv('DATABASE_URL')) {
-            // Parse DATABASE_URL (format: postgresql://user:pass@host:port/dbname?sslmode=require)
-            \$url = getenv('DATABASE_URL');
-            \$parts = parse_url(\$url);
-            \$host = \$parts['host'];
-            \$port = \$parts['port'] ?? 5432;
-            \$dbname = ltrim(\$parts['path'], '/');
-            \$user = \$parts['user'];
-            \$pass = \$parts['pass'];
-            \$dsn = \"pgsql:host={\$host};port={\$port};dbname={\$dbname};sslmode=require\";
-            \$pdo = new PDO(\$dsn, \$user, \$pass, [PDO::ATTR_TIMEOUT => 5]);
+        \$url = getenv('DATABASE_URL');
+        if (\$url) {
+            \$p = parse_url(\$url);
+            \$host   = \$p['host'];
+            \$port   = isset(\$p['port']) ? \$p['port'] : 5432;
+            \$dbname = ltrim(\$p['path'], '/');
+            \$dbname = explode('?', \$dbname)[0];
+            \$user   = \$p['user'];
+            \$pass   = \$p['pass'];
+            \$dsn    = 'pgsql:host=' . \$host . ';port=' . \$port . ';dbname=' . \$dbname . ';sslmode=require';
+            new PDO(\$dsn, \$user, \$pass, [PDO::ATTR_TIMEOUT => 5]);
         } else {
-            \$dsn = 'pgsql:host=' . getenv('DB_HOST') . ';port=' . (getenv('DB_PORT') ?: '5432') . ';dbname=' . getenv('DB_DATABASE') . ';sslmode=prefer';
-            \$pdo = new PDO(\$dsn, getenv('DB_USERNAME'), getenv('DB_PASSWORD'), [PDO::ATTR_TIMEOUT => 5]);
+            \$host = getenv('DB_HOST');
+            \$port = getenv('DB_PORT') ?: '5432';
+            \$db   = getenv('DB_DATABASE');
+            \$user = getenv('DB_USERNAME');
+            \$pass = getenv('DB_PASSWORD');
+            \$dsn  = 'pgsql:host=' . \$host . ';port=' . \$port . ';dbname=' . \$db . ';sslmode=prefer';
+            new PDO(\$dsn, \$user, \$pass, [PDO::ATTR_TIMEOUT => 5]);
         }
     } catch (Exception \$e) {
         file_put_contents('/tmp/db_error.log', \$e->getMessage());
@@ -70,53 +59,52 @@ until php -r "
 "; do
     RETRIES=$((RETRIES+1))
     if [ $RETRIES -ge $MAX_RETRIES ]; then
-        echo "❌ PostgreSQL connection timeout! Last error:"
-        cat /tmp/db_error.log 2>/dev/null || echo "(no error log)"
-        echo "⚠️  Starting services anyway..."
+        echo "❌ Timeout PostgreSQL ! Dernière erreur :"
+        cat /tmp/db_error.log 2>/dev/null || echo "(pas de log)"
+        echo "⚠️  Démarrage des services quand même..."
         break
     fi
-    echo "   PostgreSQL not ready yet — retrying in 2s... ($RETRIES/$MAX_RETRIES)"
+    echo "   PostgreSQL pas prêt — nouvelle tentative dans 2s... ($RETRIES/$MAX_RETRIES)"
     sleep 2
 done
 
 if [ $RETRIES -lt $MAX_RETRIES ]; then
-    echo "✅ PostgreSQL is ready!"
+    echo "✅ PostgreSQL est prêt !"
 fi
 
 # ---------------------------------------------------------------
 # Générer la clé si elle n'existe pas
 # ---------------------------------------------------------------
 if [ -z "$APP_KEY" ]; then
-    echo "🔑 Generating APP_KEY..."
+    echo "🔑 Génération de APP_KEY..."
     php artisan key:generate --force
 fi
 
 # ---------------------------------------------------------------
-# Migrations (seulement si la DB est accessible)
+# Migrations (seulement si DB accessible)
 # ---------------------------------------------------------------
 if [ $RETRIES -lt $MAX_RETRIES ]; then
-    echo "🗄️  Running database migrations..."
-    php artisan migrate --force || echo "⚠️  Migration failed, continuing..."
+    echo "🗄️  Exécution des migrations..."
+    php artisan migrate --force || echo "⚠️  Migration échouée, on continue quand même..."
 else
-    echo "⚠️  Skipping migrations because database is unreachable."
+    echo "⚠️  Migrations ignorées (base de données inaccessible)."
 fi
 
 # ---------------------------------------------------------------
 # Optimisations production
 # ---------------------------------------------------------------
-echo "⚡ Optimizing for production..."
-php artisan config:cache  || true
-php artisan route:cache   || true
-php artisan view:cache    || true
+echo "⚡ Optimisation pour la production..."
+php artisan config:cache || true
+php artisan route:cache  || true
+php artisan view:cache   || true
 
 # ---------------------------------------------------------------
 # Lien symbolique Storage
 # ---------------------------------------------------------------
-echo "🔗 Creating storage symlink..."
+echo "🔗 Création du lien symbolique storage..."
 php artisan storage:link 2>/dev/null || true
 
-echo "✅ Startup complete! Starting services..."
+echo "✅ Démarrage complet ! Lancement des services..."
 echo "=============================================="
 
-# Passer la main à supervisord (Nginx + PHP-FPM)
 exec "$@"
