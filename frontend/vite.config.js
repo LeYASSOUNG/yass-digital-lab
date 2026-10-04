@@ -46,9 +46,6 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('lucide-vue-next')) {
-              return 'icons'
-            }
             if (id.includes('/vue/') || id.includes('pinia') || id.includes('vue-router')) {
               return 'vendor-vue'
             }
@@ -57,8 +54,5 @@ export default defineConfig({
         }
       }
     }
-  },
-  optimizeDeps: {
-    include: ['lucide-vue-next']
   }
 })
