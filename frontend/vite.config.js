@@ -42,24 +42,23 @@ export default defineConfig({
     }
   },
   build: {
-    minify: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
             if (id.includes('lucide-vue-next')) {
-              return 'icons';
+              return 'icons'
             }
-            if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
-              return 'vendor-vue';
+            if (id.includes('/vue/') || id.includes('pinia') || id.includes('vue-router')) {
+              return 'vendor-vue'
             }
-            return 'vendor';
+            return 'vendor'
           }
         }
       }
     }
   },
   optimizeDeps: {
-    include: ['lucide-vue-next', '@lucide/vue', 'vue', 'pinia', 'vue-router']
+    include: ['lucide-vue-next']
   }
 })
