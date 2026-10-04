@@ -37,7 +37,8 @@ LABEL version="2.0.0"
 LABEL description="Laravel 12 API Backend — Yass Digital Lab"
 
 # --- Extensions PHP requises ---
-RUN apk add --no-cache \
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && apk add --no-cache \
         nginx \
         supervisor \
         postgresql-dev \
@@ -60,6 +61,8 @@ RUN apk add --no-cache \
         pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis \
+    && apk del .build-deps \
+    && rm -rf /tmp/pear \
     && rm -rf /var/cache/apk/*
 
 # --- Configuration PHP Optimisée pour Production ---
