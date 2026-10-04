@@ -25,8 +25,8 @@ until php -r "
         exit(1);
     }
 "; do
-    RETRIES=\$((RETRIES+1))
-    if [ \$RETRIES -ge \$MAX_RETRIES ]; then
+    RETRIES=$((RETRIES+1))
+    if [ $RETRIES -ge $MAX_RETRIES ]; then
         echo "❌ PostgreSQL connection timeout! Last error:"
         cat /tmp/db_error.log || true
         echo "⚠️  Starting services anyway..."
@@ -36,7 +36,7 @@ until php -r "
     sleep 2
 done
 
-if [ \$RETRIES -lt \$MAX_RETRIES ]; then
+if [ $RETRIES -lt $MAX_RETRIES ]; then
     echo "✅ PostgreSQL is ready!"
 fi
 
@@ -46,7 +46,7 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-if [ \$RETRIES -lt \$MAX_RETRIES ]; then
+if [ $RETRIES -lt $MAX_RETRIES ]; then
     # Exécuter les migrations uniquement si PostgreSQL est prêt
     echo "🗄️  Running database migrations..."
     php artisan migrate --force || true
