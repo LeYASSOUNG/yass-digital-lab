@@ -210,4 +210,21 @@ class ProductController extends Controller
 
         return \Illuminate\Support\Facades\Storage::disk('local')->download($product->download_url, \Illuminate\Support\Str::slug($product->title) . '.zip');
     }
+
+    /**
+     * Retourne des produits suggérés (Cross-sell) pour un produit donné.
+     */
+    public function getCrossSellingProducts(int $id)
+    {
+        $product = Product::findOrFail($id);
+        
+        // Exemple simple : même catégorie, excluant le produit actuel
+        $crossSells = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $id)
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+            
+        return response()->json($crossSells);
+    }
 }
