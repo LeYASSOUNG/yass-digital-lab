@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="client-dashboard container" style="margin-top: 30px;">
     
     <!-- Welcome Header Banner -->
@@ -409,7 +409,8 @@ import {
   Star,
   MessageSquare,
   Linkedin,
-  Sparkles
+  Sparkles,
+  LifeBuoy
 } from 'lucide-vue-next';
 
 const router = useRouter();
