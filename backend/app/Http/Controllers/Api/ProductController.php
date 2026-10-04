@@ -15,6 +15,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -204,11 +205,14 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        if (!$product->download_url || !\Illuminate\Support\Facades\Storage::disk('local')->exists($product->download_url)) {
+        if (!$product->download_url || !Storage::disk('local')->exists($product->download_url)) {
             abort(404, 'Fichier source introuvable sur le serveur.');
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('local')->download($product->download_url, \Illuminate\Support\Str::slug($product->title) . '.zip');
+        $filePath = storage_path('app/' . $product->download_url);
+        $fileName = Str::slug($product->title) . '.zip';
+
+        return response()->download($filePath, $fileName);
     }
 
     /**
