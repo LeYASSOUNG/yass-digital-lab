@@ -172,6 +172,9 @@ class AuthController extends Controller
             }
         } catch (\Throwable $e) {
             Log::error('Erreur envoi réinitialisation mot de passe: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Erreur serveur lors de l\'envoi de l\'email. Détail technique : ' . $e->getMessage()
+            ], 500);
         }
 
         return response()->json([
